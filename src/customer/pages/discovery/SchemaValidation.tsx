@@ -1,0 +1,242 @@
+import React, { useState } from 'react';
+import { useLatestSpec, useSpecHistory, useSpecDiff, useSchemaViolations } from '@/hooks/use-openapi-docs';
+import EvidencePanel from '@/components/ui/EvidencePanel';
+import EvidenceSectionHead from '@/components/ui/EvidenceSectionHead';
+import { EvidenceStatLine } from '@/components/ui/EvidenceStatLine';
+import { EvidenceBadge } from '@/components/ui/EvidenceStatLine';
+import {
+  FileCode2, CheckCircle2, XCircle, AlertTriangle, ChevronDown, ChevronUp,
+  Filter
+} from 'lucide-react';
+import { SchemaViolation } from '@/services/openapi.service';
+
+
+
+const VIOLATION_TYPE_LABELS: Record<string, string> = {
+  MISSING_REQUIRED_FIELD: 'Missing Required Field',
+  TYPE_MISMATCH: 'Type Mismatch',
+  EXTRA_FIELD: 'Extra Field (Mass Assignment)',
+  ENUM_VIOLATION: 'Enum Violation',
+  FORMAT_VIOLATION: 'Format Violation',
+  UNEXPECTED_NULL: 'Unexpected Null',
+};
+
+function methodColor(m: string) {
+  const colors: Record<string, string> = { GET: 'bg-green-100 text-green-700', POST: 'bg-blue-100 text-blue-700', PUT: 'bg-amber-100 text-amber-700', PATCH: 'bg-purple-100 text-purple-700', DELETE: 'bg-red-100 text-red-700' };
+  return colors[m] || 'bg-gray-100 text-gray-600';
+}
+
+function sevBadge(s: string) {
+  const m: Record<string, string> = {
+    high: 'bg-red-100 text-red-700 border border-red-200',
+    medium: 'bg-amber-100 text-amber-700 border border-amber-200',
+    low: 'bg-blue-100 text-blue-700 border border-blue-200',
+  };
+  return m[s] || 'bg-gray-100 text-gray-600';
+}
+
+function ViolationRow({ v }: { v: SchemaViolation }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="bg-bg-elevated border border-border-subtle rounded-xl overflow-hidden">
+      <button
+        className="w-full flex items-center gap-3 px-4 py-3 hover:bg-bg-subtle/40 transition-colors text-left"
+        onClick={() => setOpen(o => !o)}
+      >
+        <XCircle className={`h-4 w-4 shrink-0 ${v.severity === 'high' ? 'text-red-500' : v.severity === 'medium' ? 'text-amber-500' : 'text-blue-400'}`} />
+        <div className="flex-1 min-w-0 flex items-center gap-2 flex-wrap">
+          <span className={`text-[10px] px-1.5 py-0.5 rounded font-bold ${methodColor(v.method)}`}>{v.method}</span>
+          <span className="text-sm font-mono text-text-primary">{v.endpoint}</span>
+          <span className={`text-[10px] px-1.5 py-0.5 rounded border ${sevBadge(v.severity)}`}>{v.severity}</span>
+          <span className="text-xs text-text-muted">{VIOLATION_TYPE_LABELS[v.violation_type] || v.violation_type}</span>
+          <span className="text-[10px] bg-bg-subtle border border-border-subtle px-1.5 py-0.5 rounded ml-auto">{v.count}× occurrences</span>
+        </div>
+        {open ? <ChevronUp className="h-4 w-4 text-text-muted shrink-0" /> : <ChevronDown className="h-4 w-4 text-text-muted shrink-0" />}
+      </button>
+      {open && (
+        <div className="border-t border-border-subtle px-4 py-3 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs bg-bg-subtle/30">
+          <div>
+            <div className="text-text-muted mb-1">Field</div>
+            <code className="font-mono text-text-primary">{v.field}</code>
+          </div>
+          <div>
+            <div className="text-text-muted mb-1">Expected</div>
+            <code className="font-mono text-green-600">{v.expected}</code>
+          </div>
+          <div>
+            <div className="text-text-muted mb-1">Actual</div>
+            <code className="font-mono text-red-500">{v.actual}</code>
+          </div>
+          <div className="sm:col-span-3 text-text-muted text-[10px]">
+            Last seen {new Date(v.last_seen).toLocaleString()}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function SpecAndDriftSection() {
+  const { data: latest } = useLatestSpec();
+  const { data: history } = useSpecHistory();
+  const [baseId, setBaseId] = useState<string | null>(null);
+  const [revisionId, setRevisionId] = useState<string | null>(null);
+  const { data: diff } = useSpecDiff(baseId, revisionId);
+
+  const pathCount = latest?.spec?.paths ? Object.keys(latest.spec.paths).length : 0;
+
+  return (
+    <EvidencePanel exhibit="EXH-DOC">
+      <EvidenceSectionHead code="§DOC" title="API Documentation & Drift" desc="AUTO-GENERATED FROM OBSERVED TRAFFIC" />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
+        <div>
+          <EvidenceStatLine label="Current Spec Paths" value={pathCount} />
+          <EvidenceStatLine label="Versions Stored" value={history?.total ?? 0} />
+        </div>
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-text-muted mb-2">Version History</p>
+          <div className="space-y-1 max-h-32 overflow-auto">
+            {(history?.specs ?? []).map((spec) => (
+              <button
+                key={spec.id}
+                className="w-full flex items-center justify-between text-xs px-2 py-1 rounded hover:bg-bg-elevated"
+                onClick={() => {
+                  if (!baseId) setBaseId(spec.id);
+                  else setRevisionId(spec.id);
+                }}
+              >
+                <span className="font-mono">{spec.id.slice(0, 8)}</span>
+                <span className="text-text-muted">{spec.path_count} paths</span>
+              </button>
+            ))}
+          </div>
+          {baseId && revisionId && (
+            <button
+              className="text-[10px] text-brand mt-1"
+              onClick={() => { setBaseId(null); setRevisionId(null); }}
+            >
+              Clear selection
+            </button>
+          )}
+        </div>
+      </div>
+
+      {diff && (
+        <div className="mt-4 space-y-2">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-text-muted">
+            Diff: {diff.breaking_changes.length} change(s)
+          </p>
+          {diff.breaking_changes.map((change) => (
+            <div key={change.fingerprint} className="flex items-start gap-2 text-xs border-t border-border-subtle pt-2">
+              <EvidenceBadge color={change.severity === 'CRITICAL' || change.severity === 'HIGH' ? '#D63D2F' : '#D4A017'}>
+                {change.severity}
+              </EvidenceBadge>
+              <div>
+                <p className="font-mono">{change.method ? `${change.method.toUpperCase()} ` : ''}{change.path}</p>
+                <p className="text-text-muted">{change.message}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </EvidencePanel>
+  );
+}
+
+export default function SchemaValidation() {
+  const [severityFilter, setSeverityFilter] = useState<string>('all');
+
+  const { data } = useSchemaViolations();
+  const violations = data?.violations || [];
+  const isEmpty = violations.length === 0;
+
+  const filtered = severityFilter === 'all' ? violations : violations.filter(v => v.severity === severityFilter);
+  const highCount = violations.filter(v => v.severity === 'high').length;
+  const medCount = violations.filter(v => v.severity === 'medium').length;
+  const lowCount = violations.filter(v => v.severity === 'low').length;
+
+  return (
+    <div className="space-y-4 p-4">
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <div>
+          <h1 className="text-lg font-semibold text-text-primary flex items-center gap-2">
+            <FileCode2 className="h-5 w-5 text-brand" />
+            Schema Validation
+          </h1>
+          <p className="text-xs text-text-muted mt-0.5">
+            Requests that violate your OpenAPI schema — type mismatches, missing fields, mass assignment
+          </p>
+        </div>
+        {isEmpty && (
+          <span className="text-[10px] bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.5 rounded-full">
+            Awaiting data · Upload OpenAPI spec to enable real validation
+          </span>
+        )}
+      </div>
+
+      <SpecAndDriftSection />
+
+      {/* KPI row */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="bg-bg-elevated border border-border-subtle rounded-xl p-4 flex items-center gap-3">
+          <CheckCircle2 className="h-5 w-5 text-green-500 shrink-0" />
+          <div>
+            <div className="text-xl font-bold text-text-primary">{violations.length}</div>
+            <div className="text-xs text-text-muted">Total Violations</div>
+          </div>
+        </div>
+        <div className="bg-bg-elevated border border-red-200 rounded-xl p-4 flex items-center gap-3">
+          <XCircle className="h-5 w-5 text-red-500 shrink-0" />
+          <div>
+            <div className="text-xl font-bold text-red-500">{highCount}</div>
+            <div className="text-xs text-text-muted">High Severity</div>
+          </div>
+        </div>
+        <div className="bg-bg-elevated border border-border-subtle rounded-xl p-4 flex items-center gap-3">
+          <AlertTriangle className="h-5 w-5 text-amber-500 shrink-0" />
+          <div>
+            <div className="text-xl font-bold text-amber-500">{medCount}</div>
+            <div className="text-xs text-text-muted">Medium</div>
+          </div>
+        </div>
+        <div className="bg-bg-elevated border border-border-subtle rounded-xl p-4 flex items-center gap-3">
+          <AlertTriangle className="h-5 w-5 text-blue-400 shrink-0" />
+          <div>
+            <div className="text-xl font-bold text-blue-500">{lowCount}</div>
+            <div className="text-xs text-text-muted">Low</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Filter */}
+      <div className="flex items-center gap-2">
+        <Filter className="h-3.5 w-3.5 text-text-muted" />
+        <span className="text-xs text-text-muted">Severity:</span>
+        {['all', 'high', 'medium', 'low'].map(s => (
+          <button
+            key={s}
+            onClick={() => setSeverityFilter(s)}
+            className={`text-xs px-2.5 py-1 rounded-lg transition-colors ${
+              severityFilter === s
+                ? 'bg-brand text-white'
+                : 'bg-bg-subtle border border-border-subtle text-text-secondary hover:bg-bg-elevated'
+            }`}
+          >
+            {s.charAt(0).toUpperCase() + s.slice(1)}
+          </button>
+        ))}
+      </div>
+
+      <div className="space-y-2">
+        {filtered.length === 0 ? (
+          <div className="flex flex-col items-center py-16 text-text-muted">
+            <CheckCircle2 className="h-8 w-8 mb-2 opacity-30" />
+            <p className="text-sm">No violations for selected filter</p>
+          </div>
+        ) : (
+          filtered.map(v => <ViolationRow key={v.id} v={v} />)
+        )}
+      </div>
+    </div>
+  );
+}
