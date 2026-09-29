@@ -20,7 +20,9 @@ import EvidenceSectionHead from '@/components/ui/EvidenceSectionHead';
 import EvidenceStamp from '@/components/ui/EvidenceStamp';
 import EvidenceLedgerItem from '@/components/ui/EvidenceLedger';
 import { EvidenceStatLine, EvidenceBarLine } from '@/components/ui/EvidenceStatLine';
+import { SignalBoard } from './SignalBoard';
 import EvidenceTrace from '@/components/ui/EvidenceTrace';
+import SentinelArea, { SentinelDonut, SentinelHBars, SentinelVBars, SentinelSpark, type ChartSeries } from '@/components/charts/SentinelCharts';
 import { useLiveTraffic, useRealtimeStatus } from '@/lib/realtime';
 import { formatClock, formatProtocol, formatRelative, methodTone, statusTone } from '@/lib/format';
 
@@ -128,6 +130,7 @@ const Dashboard: React.FC = () => {
   const categories = Object.entries(categoryCount.data?.categoryCount ?? {});
   const topCategories = categories.sort((a, b) => b[1] - a[1]).slice(0, 6);
   const maxCatVal = topCategories.length > 0 ? (topCategories[0][1] as number) : 1;
+  const orderedCats = topCategories.map(([name, count]) => ({ name, count: count as number }));
 
   const geoThreats = useMemo(() => {
     const countryCounts = geoCount.data?.countPerCountry || {};
@@ -158,7 +161,7 @@ const Dashboard: React.FC = () => {
             Case file · live posture
           </p>
           <h1 className="evd-display text-2xl md:text-3xl leading-tight" style={{ color: 'var(--evd-paper)' }}>
-            {displayName.toUpperCase()}
+            {displayName}
           </h1>
           <p className="mt-2 text-sm max-w-md" style={{ color: 'var(--evd-ink)' }}>
             Resolved vs open issues form the score. Numbers below are live API counts only.
@@ -337,6 +340,15 @@ const Dashboard: React.FC = () => {
       {/* Timeline */}
       <div className="animate-slide-up" style={{ animationDelay: '160ms' }}>
         <EvidenceSectionHead code="§06" title="Event Trace" desc={timeRange === '24h' ? 'LAST 24 HOURS' : 'LAST 7 DAYS'} />
+        {/* __DASHBOARD_SIGNAL_ANCHOR__ */}
+        <SignalBoard
+          timeline={timelineData}
+          range={timeRange}
+          severity={sevBreakdown.data?.severityCount}
+          categories={orderedCats}
+          live={recentLogs}
+          connected={realtime.connected}
+        />
         <EvidencePanel exhibit="EXH-06">
           <div className="flex gap-1 mb-4">
             {(['total', 'blocked', 'successful'] as const).map((key) => (

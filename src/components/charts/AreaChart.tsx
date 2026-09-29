@@ -67,18 +67,18 @@ const AreaChartComponent: React.FC<AreaChartProps> = ({
             ))}
           </defs>
           {showGrid && (
-            <CartesianGrid strokeDasharray="3 3" stroke="#E4E4EC" vertical={false} />
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" vertical={false} />
           )}
           <XAxis
             dataKey={xKey}
-            stroke="#9D9DAF"
+            stroke="var(--text-muted)"
             fontSize={10}
             tickLine={false}
             axisLine={false}
             dy={10}
           />
           <YAxis
-            stroke="#9D9DAF"
+            stroke="var(--text-muted)"
             fontSize={10}
             tickLine={false}
             axisLine={false}
@@ -86,7 +86,7 @@ const AreaChartComponent: React.FC<AreaChartProps> = ({
           />
           <Tooltip
             content={<CustomTooltip />}
-            cursor={{ stroke: 'rgba(99,44,175,0.2)', strokeWidth: 1 }}
+            cursor={{ stroke: 'var(--chart-cursor)', strokeWidth: 1 }}
           />
           {areas.map((area) => (
             <Area

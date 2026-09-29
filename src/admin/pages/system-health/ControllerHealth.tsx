@@ -1,6 +1,7 @@
 import React from 'react';
 import { RefreshCw, Server } from 'lucide-react';
 import TableSkeleton from '@/components/shared/TableSkeleton';
+import TableScroller from '@/components/shared/TableScroller';
 import QueryError from '@/components/shared/QueryError';
 import StatusPulse from '@/components/ui/StatusPulse';
 import { useModuleInfo } from '@/hooks/use-admin';
@@ -42,9 +43,9 @@ const ControllerHealth: React.FC = () => {
         </div>
 
         {isLoading ? <TableSkeleton columns={7} rows={5} /> : (
-          <div className="overflow-x-auto flex-1">
+          <TableScroller className="flex-1" label="Controllers">
             <table className="w-full text-left border-collapse table-fixed min-w-[600px]">
-              <thead className="bg-bg-base/50">
+              <thead className="tbl-sticky bg-bg-base/50">
                 <tr>
                   {['Host Name', 'Module', 'Version', 'IP Address', 'Status', 'Last Heartbeat', 'Policy Ver.'].map(h => (
                     <th key={h} className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-text-muted">{h}</th>
@@ -76,7 +77,7 @@ const ControllerHealth: React.FC = () => {
                 )}
               </tbody>
             </table>
-          </div>
+          </TableScroller>
         )}
       </div>
     </div>

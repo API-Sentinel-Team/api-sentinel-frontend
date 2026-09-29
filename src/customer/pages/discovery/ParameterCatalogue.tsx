@@ -46,7 +46,7 @@ const ParameterCatalogue: React.FC = () => {
           label="Body Parameters"
           value={params.filter(p => !p.isHeader).length}
           icon={AlertTriangle}
-          iconColor="#FF5B2E"
+          iconColor="var(--brand)"
           iconBg="rgba(99,44,175,0.1)"
           compact
         />

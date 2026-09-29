@@ -1,6 +1,7 @@
 import React from 'react';
 import { RefreshCw, ShieldCheck } from 'lucide-react';
 import TableSkeleton from '@/components/shared/TableSkeleton';
+import TableScroller from '@/components/shared/TableScroller';
 import QueryError from '@/components/shared/QueryError';
 import StatusPulse from '@/components/ui/StatusPulse';
 import { useModuleInfo } from '@/hooks/use-admin';
@@ -30,7 +31,7 @@ const EnforcerHealth: React.FC = () => {
       <div className="bg-bg-surface border border-border-subtle rounded-xl overflow-hidden flex flex-col min-h-[500px]">
         <div className="p-3 border-b border-border-subtle flex items-center justify-between">
           <span className="text-xs font-bold text-text-primary flex items-center gap-2">
-            <ShieldCheck size={14} className="text-[#FF5B2E]" />
+            <ShieldCheck size={14} className="text-brand" />
             Enforcers
             <span className="text-[11px] bg-bg-elevated border border-border-subtle px-2 py-0.5 rounded-full text-text-muted">{enforcers.length}</span>
           </span>
@@ -41,9 +42,9 @@ const EnforcerHealth: React.FC = () => {
         </div>
 
         {isLoading ? <TableSkeleton columns={6} rows={3} /> : (
-          <div className="overflow-x-auto flex-1">
+          <TableScroller className="flex-1" label="Enforcers">
             <table className="w-full text-left border-collapse table-fixed min-w-[550px]">
-              <thead className="bg-bg-base/50">
+              <thead className="tbl-sticky bg-bg-base/50">
                 <tr>
                   {['Host Name', 'Module', 'Version', 'IP Address', 'Status', 'Last Heartbeat'].map(h => (
                     <th key={h} className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-text-muted">{h}</th>
@@ -74,7 +75,7 @@ const EnforcerHealth: React.FC = () => {
                 )}
               </tbody>
             </table>
-          </div>
+          </TableScroller>
         )}
       </div>
     </div>

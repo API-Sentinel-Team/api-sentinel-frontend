@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useDeferredValue } from 'react';
-import { ChevronRight, Bell, Search, ChevronDown, RefreshCw, LogOut, Clock, Zap, Settings, Menu, Moon, Sun } from 'lucide-react';
+import { ChevronRight, Bell, Search, ChevronDown, RefreshCw, LogOut, Clock, Settings, Menu, Moon, Sun } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/lib/auth-context';
 import { useOnboarding } from '@/lib/onboarding-context';
@@ -135,11 +135,11 @@ export const TopBar: React.FC<{ workspace: WorkspaceConfig }> = ({ workspace }) 
   return (
     <>
       <div
-        className="flex items-center justify-between px-5 py-2 border-b shrink-0 border-border-subtle glass"
+        className="flex min-w-0 items-center justify-between gap-3 border-b border-white/10 px-5 py-2.5 glass shrink-0"
         style={{ minHeight: 48, maxWidth: '100vw' }}
       >
         {/* Left: Breadcrumb */}
-        <div className="flex items-center gap-2">
+        <div className="flex min-w-0 flex-1 items-center gap-2">
           <button
             onClick={openMobileSidebar}
             className="flex h-8 w-8 items-center justify-center rounded-lg border border-border-subtle bg-bg-elevated/60 text-text-muted transition-colors hover:text-text-primary hover:border-brand/20 lg:hidden"
@@ -157,7 +157,7 @@ export const TopBar: React.FC<{ workspace: WorkspaceConfig }> = ({ workspace }) 
                 <div className="w-5 h-5 rounded-md bg-brand/10 border border-brand/20 flex items-center justify-center">
                   <div className="w-2 h-2 rounded-sm bg-brand" />
                 </div>
-                <span className="max-w-[100px] truncate sm:max-w-[140px] md:max-w-[200px]">{activeContext}</span>
+                <span className="max-w-[100px] truncate sm:max-w-[140px] md:max-w-[200px]" title={activeContext}>{activeContext}</span>
                 <ChevronDown size={11} className={`transition-transform duration-200 text-muted-foreground ${appOpen ? 'rotate-180' : ''}`} />
               </button>
               {appOpen && (
@@ -169,7 +169,7 @@ export const TopBar: React.FC<{ workspace: WorkspaceConfig }> = ({ workspace }) 
                     )}
                     {appNames.map(app => (
                       <button key={app} onClick={() => { setSelectedApp(app); setAppOpen(false); }}
-                        className={`w-full text-left px-3 py-2 text-xs transition-colors hover:bg-black/[0.04] ${app === activeApp ? 'text-brand font-semibold' : 'text-text-secondary'}`}>
+                        className={`w-full text-left px-3 py-2 text-xs transition-colors hover:bg-bg-hover ${app === activeApp ? 'text-brand font-semibold' : 'text-text-secondary'}`}>
                         {app}
                       </button>
                     ))}
@@ -178,18 +178,18 @@ export const TopBar: React.FC<{ workspace: WorkspaceConfig }> = ({ workspace }) 
               )}
             </div>
           ) : (
-            <div className="inline-flex items-center gap-2 rounded-full border border-border-subtle bg-bg-elevated px-3 py-1 text-[11px] font-semibold text-text-secondary">
-              <div className="w-2 h-2 rounded-full bg-brand" />
-              {activeContext}
+            <div className="inline-flex max-w-[180px] items-center gap-2 truncate whitespace-nowrap rounded-full border border-border-subtle bg-bg-elevated px-3 py-1 text-[11px] font-semibold text-text-secondary" title={activeContext}>
+              <div className="w-2 h-2 shrink-0 rounded-full bg-brand" />
+              <span className="truncate">{activeContext}</span>
             </div>
           )}
 
-          <ChevronRight size={12} className="text-text-muted" />
-          <span className="text-xs font-medium text-text-secondary">{currentPage}</span>
+          <ChevronRight size={12} className="hidden shrink-0 text-text-muted sm:block" />
+          <span className="hidden min-w-0 truncate text-xs font-medium text-text-secondary sm:block sm:max-w-[120px] md:max-w-[200px]" title={currentPage}>{currentPage}</span>
           {subPage && (
             <>
-              <ChevronRight size={12} className="text-text-muted" />
-              <span className="text-xs font-semibold text-text-primary">
+              <ChevronRight size={12} className="hidden shrink-0 text-text-muted md:block" />
+              <span className="hidden min-w-0 truncate text-xs font-semibold text-text-primary md:block md:max-w-[160px]" title={subPage}>
                 {workspacePathParts[1] === 'api-catalogue' ? 'API Catalogue' :
                   workspacePathParts[1] === 'api-governance' ? 'API Governance' : subPage}
               </span>
@@ -198,13 +198,13 @@ export const TopBar: React.FC<{ workspace: WorkspaceConfig }> = ({ workspace }) 
         </div>
 
         {/* Right: Actions */}
-        <div className="flex items-center gap-2">
+        <div className="flex shrink-0 items-center gap-1.5">
           {showWorkspaceSwitcher && (
             <div className="relative hidden md:block">
               <button
                 data-testid="workspace-switcher"
                 onClick={() => setWorkspaceOpen((open) => !open)}
-                className="flex items-center gap-2 rounded-full border border-border-subtle bg-bg-elevated px-3 py-1 text-[11px] font-semibold text-text-secondary transition-colors hover:border-brand/20 hover:text-text-primary"
+                className="flex shrink-0 items-center gap-2 whitespace-nowrap rounded-full border border-border-subtle bg-bg-elevated px-3 py-1 text-[11px] font-semibold text-text-secondary transition-colors hover:border-brand/20 hover:text-text-primary"
               >
                 <span>{workspace.shortLabel}</span>
                 <ChevronDown
@@ -231,7 +231,7 @@ export const TopBar: React.FC<{ workspace: WorkspaceConfig }> = ({ workspace }) 
                               if (!isActive) navigate(option.homePath);
                             }}
                             className={`flex w-full items-center justify-between gap-3 px-3 py-2.5 text-left transition-colors ${
-                              isActive ? 'bg-brand/5 text-text-primary' : 'text-text-secondary hover:bg-black/[0.04] hover:text-text-primary'
+                              isActive ? 'bg-brand/10 text-text-primary' : 'text-text-secondary hover:bg-bg-hover hover:text-text-primary'
                             }`}
                           >
                             <div>
@@ -259,37 +259,32 @@ export const TopBar: React.FC<{ workspace: WorkspaceConfig }> = ({ workspace }) 
           {workspace.key === 'admin' && !onboarding.data.completed && (
             <button
               onClick={() => navigate('/admin/onboarding')}
-              className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-brand/10 border border-brand/20 text-[11px] text-brand font-semibold"
+              className="hidden shrink-0 whitespace-nowrap lg:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-brand/10 border border-brand/20 text-[11px] text-brand font-semibold"
             >
               Setup {onboarding.progress}%
             </button>
           )}
 
-          <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-[11px] text-emerald-600 font-semibold">
-            <Zap size={10} />
-            {workspace.badge}
-          </div>
-
-          <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-border-subtle bg-bg-elevated text-[11px] font-semibold text-text-secondary">
-            <span className={`w-2 h-2 rounded-full ${streamConnected ? 'bg-green-500' : 'bg-amber-500 animate-pulse'}`} />
+          <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-border-subtle bg-bg-elevated text-[11px] font-semibold text-text-secondary whitespace-nowrap">
+            <span className={`w-2 h-2 shrink-0 rounded-full ${streamConnected ? 'bg-green-500' : 'bg-amber-500 animate-pulse'}`} />
             {streamConnected ? 'Stream' : 'Socket'}
           </div>
 
           {/* Live sync status */}
-          <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-border-subtle bg-bg-elevated text-[11px] font-semibold text-text-secondary">
-            <span className={`w-2 h-2 rounded-full ${isFetching > 0 ? 'bg-brand animate-pulse' : 'bg-green-500'}`} />
+          <div className="hidden xl:flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-border-subtle bg-bg-elevated text-[11px] font-semibold text-text-secondary whitespace-nowrap">
+            <span className={`w-2 h-2 shrink-0 rounded-full ${isFetching > 0 ? 'bg-brand animate-pulse' : 'bg-green-500'}`} />
             {isFetching > 0 ? 'Syncing' : 'Live'}
             {lastSync && (
-              <span className="text-text-muted ml-1">
-                {lastSync.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+              <span className="text-text-muted ml-1 tabular-nums">
+                {lastSync.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
               </span>
             )}
           </div>
 
           {/* Clock */}
-          <div className="hidden md:flex items-center gap-1 text-[11px] text-text-muted tabular-nums">
+          <div className="hidden 2xl:flex items-center gap-1 text-[11px] text-text-muted tabular-nums whitespace-nowrap">
             <Clock size={11} />
-            {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+            {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
           </div>
 
           <div className="w-px h-4 bg-border-subtle mx-0.5" />
@@ -338,7 +333,7 @@ export const TopBar: React.FC<{ workspace: WorkspaceConfig }> = ({ workspace }) 
           <div className="relative">
             <button
               onClick={() => setUserMenuOpen(v => !v)}
-              className="flex items-center gap-2 pl-1 pr-2.5 py-1 rounded-lg hover:bg-black/[0.03] transition-colors outline-none"
+              className="flex items-center gap-2 pl-1 pr-2.5 py-1 rounded-lg hover:bg-bg-hover transition-colors outline-none"
             >
               <div className="w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold text-white shadow-sm bg-gradient-to-br from-brand to-brand-dark ring-2 ring-brand/20">
                 {initials}
@@ -351,17 +346,17 @@ export const TopBar: React.FC<{ workspace: WorkspaceConfig }> = ({ workspace }) 
             {userMenuOpen && (
               <>
                 <div className="fixed inset-0 z-40" onClick={() => setUserMenuOpen(false)} />
-                <div className="absolute right-0 top-full mt-1.5 w-44 sm:w-52 rounded-xl border border-border-subtle shadow-2xl z-50 py-1 glass-card-premium animate-scale-in">
-                  <div className="px-3 py-3 border-b border-border-subtle">
-                    <div className="text-xs font-semibold text-text-primary">{displayName}</div>
-                    <div className="text-[11px] text-text-muted mt-0.5">{user?.login}</div>
+                <div className="absolute right-0 top-full z-50 mt-1.5 w-56 overflow-hidden rounded-xl border border-border-subtle shadow-2xl py-1 glass-card-premium animate-scale-in sm:w-64">
+                  <div className="border-b border-border-subtle px-3 py-3">
+                    <div className="truncate text-xs font-semibold text-text-primary" title={typeof displayName === 'string' ? displayName : undefined}>{displayName}</div>
+                    <div className="mt-0.5 break-all text-[11px] text-text-muted" title={user?.login}>{user?.login}</div>
                     <div className="mt-1.5 inline-block px-2 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider text-brand border border-brand/20 bg-brand/10">
                       {roleLabel}
                     </div>
                   </div>
                   <button
                     onClick={() => { setUserMenuOpen(false); navigate(settingsTarget); }}
-                    className="w-full text-left px-3 py-2 text-xs text-text-secondary hover:text-text-primary hover:bg-black/[0.04] transition-colors flex items-center gap-2"
+                    className="w-full text-left px-3 py-2 text-xs text-text-secondary hover:text-text-primary hover:bg-bg-hover transition-colors flex items-center gap-2"
                   >
                     <Settings size={12} />
                     Settings
@@ -404,7 +399,7 @@ export const TopBar: React.FC<{ workspace: WorkspaceConfig }> = ({ workspace }) 
                 <button
                   key={item.path}
                   onClick={() => { navigate(item.path); setSearchOpen(false); }}
-                  className="w-full text-left px-4 py-3 text-xs text-text-secondary hover:text-text-primary hover:bg-black/[0.04] transition-colors flex items-center justify-between"
+                  className="w-full text-left px-4 py-3 text-xs text-text-secondary hover:text-text-primary hover:bg-bg-hover transition-colors flex items-center justify-between"
                 >
                   <div className="flex flex-col">
                     <span className="text-[12px] font-semibold">{item.label}</span>

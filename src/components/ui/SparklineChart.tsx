@@ -12,7 +12,7 @@ interface SparklineChartProps {
 
 const SparklineChart: React.FC<SparklineChartProps> = ({
   data,
-  color = '#FF5B2E',
+  color = 'var(--brand)',
   width = 80,
   height = 24,
   showDot = true,

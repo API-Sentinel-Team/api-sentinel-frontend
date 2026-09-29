@@ -100,7 +100,7 @@ const DonutChart: React.FC<DonutChartProps> = ({
             animationEasing="ease-out"
           >
             {total === 0
-              ? <Cell fill="#E4E4EC" />
+              ? <Cell fill="var(--chart-track)" />
               : data.map((entry, i) => (
                 <Cell key={i} fill={entry.color} />
               ))

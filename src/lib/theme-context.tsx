@@ -21,6 +21,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       return 'dark';
     }
     
+    // Reference workspace is light-first; fall back to light when no stored or system preference applies.
     return 'light';
   });
 

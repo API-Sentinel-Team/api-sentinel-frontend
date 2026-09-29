@@ -10,7 +10,8 @@ const NotFound = () => {
   }, [location.pathname]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-bg-base">
+    <div className="app-shell relative flex min-h-screen items-center justify-center overflow-hidden bg-bg-base">
+      <div className="app-aurora" aria-hidden />
       <div className="text-center animate-fade-in">
         {/* Glitch 404 */}
         <div className="relative mb-6">
@@ -35,7 +36,7 @@ const NotFound = () => {
             </button>
             <Link
               to="/app/dashboard"
-              className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium text-white bg-brand hover:bg-brand-light transition-all shadow-[0_0_15px_rgba(99,44,175,0.15)]"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium text-white bg-brand hover:bg-brand-light transition-all shadow-[0_0_20px_var(--brand-glow)]"
             >
               <Home size={14} />
               Dashboard

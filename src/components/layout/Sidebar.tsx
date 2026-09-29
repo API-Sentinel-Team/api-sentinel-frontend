@@ -43,11 +43,9 @@ export const Sidebar: React.FC<{ workspace: WorkspaceConfig }> = ({ workspace })
 
   const navClass = ({ isActive }: { isActive: boolean }) =>
     twMerge(clsx(
-      'relative flex items-center gap-3 w-full cursor-pointer transition-all duration-200 outline-none group rounded-lg mx-1',
-      collapsed ? 'flex-col justify-center py-2.5 px-0' : 'py-2 px-3',
-      isActive
-        ? 'text-brand nav-active-bar'
-        : 'text-text-muted hover:text-text-secondary hover:bg-black/[0.03]'
+      'rail-link group mx-1',
+      collapsed ? 'rail-link--collapsed' : 'py-2 px-3',
+      isActive && 'rail-active',
     ));
 
   // Group items by section for expanded mode
@@ -71,29 +69,29 @@ export const Sidebar: React.FC<{ workspace: WorkspaceConfig }> = ({ workspace })
 
       <nav
         className={clsx(
-          'fixed inset-y-0 left-0 z-50 flex min-h-screen w-[85vw] max-w-[280px] shrink-0 -translate-x-full flex-col border-r border-border-subtle transition-all duration-300 ease-in-out lg:static lg:z-10 lg:translate-x-0',
+          'fixed inset-y-0 left-0 z-50 flex min-h-screen w-[85vw] max-w-[280px] shrink-0 -translate-x-full flex-col sidebar-rail transition-all duration-300 ease-in-out lg:static lg:z-10 lg:translate-x-0',
           desktopWidth,
           isMobileSidebarOpen && 'translate-x-0'
         )}
-        style={{
-          background: 'var(--bg-sidebar)',
-        }}
       >
       {/* Logo */}
-      <div className="w-full border-b border-border-subtle px-3 py-4">
+      <div className="w-full border-b border-border-subtle px-3 py-4 sidebar-brand-block">
         <div className={clsx('flex items-center', collapsed ? 'justify-center' : 'justify-between gap-3')}>
           <div className={clsx('flex items-center gap-3', collapsed && 'justify-center')}>
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-bg-elevated border border-brand/20 relative shrink-0">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                <path d="M12 2L21 6.5V13C21 17.4 17 21.2 12 22C7 21.2 3 17.4 3 13V6.5L12 2Z" fill="#FF5B2E" />
-                <path d="M12 6L17 8.5V13C17 15.5 14.8 17.7 12 18.5C9.2 17.7 7 15.5 7 13V8.5L12 6Z" fill="#FFFFFF" />
-              </svg>
-              <div className="absolute -inset-1 rounded-xl border border-brand/10 animate-pulse pointer-events-none" style={{ animationDuration: '3s' }} />
+            <div className="w-10 h-10 rounded-[10px] flex items-center justify-center shrink-0"
+              style={{ background: 'var(--rail)', border: '1px solid var(--rail-line)' }}
+              aria-hidden
+            >
+              <div className="brand-bars">
+                <i />
+                <i />
+                <i />
+              </div>
             </div>
             {!collapsed && (
               <div className="animate-fade-in min-w-0">
-                <div className="text-sm font-bold text-text-primary leading-none">API Sentinel</div>
-                <div className="text-[11px] text-text-muted mt-0.5">{workspace.label}</div>
+                <div className="text-sm font-bold text-white leading-none">API Sentinel</div>
+                <div className="text-[11px] rail-meta mt-0.5">{workspace.label}</div>
               </div>
             )}
           </div>
@@ -101,7 +99,8 @@ export const Sidebar: React.FC<{ workspace: WorkspaceConfig }> = ({ workspace })
           {!isDesktop && (
             <button
               onClick={closeMobileSidebar}
-              className="w-9 h-9 rounded-xl border border-border-subtle bg-bg-elevated flex items-center justify-center text-text-muted hover:text-brand hover:border-brand/30 transition-all"
+              className="rail-chip w-9 h-9 rounded-xl border flex items-center justify-center hover:text-brand transition-all"
+              aria-label="Close navigation"
             >
               <X size={15} />
             </button>
@@ -127,7 +126,7 @@ export const Sidebar: React.FC<{ workspace: WorkspaceConfig }> = ({ workspace })
             <React.Fragment key={item.path}>
               {showSection && (
                 <div className="px-4 pt-4 pb-1.5">
-                  <span className="text-[10px] font-bold text-text-muted uppercase tracking-[0.12em]">
+                  <span className="rail-section">
                     {item.section}
                   </span>
                 </div>
@@ -144,8 +143,8 @@ export const Sidebar: React.FC<{ workspace: WorkspaceConfig }> = ({ workspace })
                       'rounded-lg flex items-center justify-center transition-all duration-200 relative shrink-0',
                       collapsed ? 'w-10 h-10' : 'w-8 h-8',
                       isActive
-                        ? 'bg-brand/10 text-brand shadow-[0_0_12px_rgba(99,44,175,0.1)]'
-                        : 'group-hover:bg-black/[0.04] text-text-muted'
+                        ? 'bg-white/10 text-[#ffd9a8]'
+                        : 'text-[#c2b29f] group-hover:text-white'
                     )}>
                       <item.icon size={collapsed ? 19 : 17} strokeWidth={isActive ? 2.2 : 1.8} />
                       {item.live && (
@@ -154,15 +153,10 @@ export const Sidebar: React.FC<{ workspace: WorkspaceConfig }> = ({ workspace })
                         </span>
                       )}
                     </div>
-                    {collapsed ? (
-                      <span className={clsx(
-                        'text-[10px] font-semibold tracking-tight leading-none',
-                        isActive ? 'text-brand' : 'text-text-muted'
-                      )}>{item.label.length > 8 ? item.label.slice(0, 7) + '...' : item.label}</span>
-                    ) : (
+                    {collapsed ? null : (
                       <span className={clsx(
                         'text-[13px] font-medium truncate animate-fade-in',
-                        isActive ? 'text-brand' : 'text-text-secondary'
+                        isActive ? 'text-[#ffd9a8]' : 'text-[#e7e0d9]'
                       )}>{item.label}</span>
                     )}
                   </>
@@ -179,7 +173,7 @@ export const Sidebar: React.FC<{ workspace: WorkspaceConfig }> = ({ workspace })
         <div className={clsx('flex items-center px-3 mb-2', collapsed ? 'justify-center' : 'gap-2')}>
           <StatusPulse variant={streamConnected ? 'online' : 'warning'} size="sm" />
           {!collapsed && (
-            <span className={clsx('text-[11px] animate-fade-in', streamConnected ? 'text-green-600' : 'text-amber-600')}>
+            <span className={clsx('rail-meta text-[11px] animate-fade-in', streamConnected ? 'text-emerald-400' : 'text-amber-400')}>
               {streamConnected ? 'Live stream' : 'Reconnecting'} · {workspace.badge}
             </span>
           )}
@@ -198,19 +192,14 @@ export const Sidebar: React.FC<{ workspace: WorkspaceConfig }> = ({ workspace })
                 <div className={clsx(
                   'rounded-lg flex items-center justify-center transition-all duration-200 shrink-0',
                   collapsed ? 'w-10 h-10' : 'w-8 h-8',
-                  isActive ? 'bg-brand/10 text-brand' : 'group-hover:bg-black/[0.04] text-text-muted'
+                  isActive ? 'bg-white/10 text-[#ffd9a8]' : 'text-[#c2b29f] group-hover:text-white'
                 )}>
                   <item.icon size={collapsed ? 19 : 17} strokeWidth={isActive ? 2.2 : 1.8} />
                 </div>
-                {collapsed ? (
-                  <span className={clsx(
-                    'text-[10px] font-semibold tracking-tight',
-                    isActive ? 'text-brand' : 'text-text-muted'
-                  )}>{item.label}</span>
-                ) : (
+                {collapsed ? null : (
                   <span className={clsx(
                     'text-[13px] font-medium animate-fade-in',
-                    isActive ? 'text-brand' : 'text-text-secondary'
+                    isActive ? 'text-[#ffd9a8]' : 'text-[#e7e0d9]'
                   )}>{item.label}</span>
                 )}
               </>
@@ -220,15 +209,15 @@ export const Sidebar: React.FC<{ workspace: WorkspaceConfig }> = ({ workspace })
 
         {/* Avatar */}
         <div className={clsx('mt-3 flex px-3', collapsed ? 'justify-center' : 'items-center gap-2.5')}>
-          <div className="w-9 h-9 rounded-full flex items-center justify-center text-[11px] font-bold text-white shadow-md bg-gradient-to-br from-brand to-brand-dark shrink-0 ring-2 ring-brand/20">
+          <div className="w-9 h-9 rounded-full flex items-center justify-center text-[11px] font-bold text-white shadow-md bg-gradient-to-br from-brand to-accent-teal shrink-0 ring-2 ring-brand/20">
             {initials}
           </div>
           {!collapsed && user && (
             <div className="animate-fade-in min-w-0">
-              <div className="text-xs font-medium text-text-primary truncate">
+              <div className="text-xs font-medium text-white truncate">
                 {user.name || user.login?.split('@')[0]}
               </div>
-              <div className="text-[11px] text-text-muted truncate">{user.login}</div>
+              <div className="text-[11px] rail-meta truncate">{user.login}</div>
             </div>
           )}
         </div>

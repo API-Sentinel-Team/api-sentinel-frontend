@@ -2,6 +2,67 @@ import React, { useState } from 'react';
 import { useAuditLogs } from '@/hooks/use-admin';
 import { ArrowLeft, ClipboardList, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import ResponsiveTable, { type Column, type RowDetail } from '@/components/shared/ResponsiveTable';
+import { DetailGrid, DetailField, DetailSection, DetailCode } from '@/components/detail/DetailGrid';
+import type { AktoAuditLog } from '@/services/admin.service';
+
+function formatTs(epoch: number): string {
+  if (!epoch) return '—';
+  return new Date(epoch).toLocaleString();
+}
+
+const logColumns: Column<AktoAuditLog>[] = [
+  {
+    key: 'timestamp',
+    label: 'Timestamp',
+    width: '180px',
+    priority: 0,
+    render: (_value, row) => (
+      <span className="whitespace-nowrap font-mono text-[11px] text-text-muted">
+        {formatTs(row.timestamp)}
+      </span>
+    ),
+  },
+  {
+    key: 'user',
+    label: 'User',
+    priority: 1,
+    render: (_value, row) => (
+      <span className="text-[12px] text-text-primary [overflow-wrap:anywhere]">{row.user}</span>
+    ),
+  },
+  {
+    key: 'action',
+    label: 'Action',
+    width: '150px',
+    priority: 2,
+    render: (_value, row) => (
+      <span className="rounded-full border border-brand/20 bg-brand/10 px-2 py-0.5 text-[11px] font-bold text-brand">
+        {row.action}
+      </span>
+    ),
+  },
+  {
+    key: 'resource',
+    label: 'Resource',
+    priority: 3,
+    render: (_value, row) => (
+      <span className="text-[11px] text-text-muted [overflow-wrap:anywhere]">
+        {row.resource || '—'}
+      </span>
+    ),
+  },
+  {
+    key: 'details',
+    label: 'Details',
+    priority: 4,
+    render: (_value, row) => (
+      <span className="text-[11px] text-text-muted [overflow-wrap:anywhere]">
+        {row.details || '—'}
+      </span>
+    ),
+  },
+];
 
 const AuditLogs: React.FC = () => {
   const navigate = useNavigate();
@@ -12,6 +73,34 @@ const AuditLogs: React.FC = () => {
   const logs = data?.auditLogs ?? [];
   const total = data?.total ?? 0;
   const totalPages = Math.ceil(total / pageSize);
+
+  /**
+   * Full record for one audit entry. The `details` field often carries a
+   * serialized payload that used to be truncated at 200px in the table —
+   * here it is always readable in full (and copied verbatim).
+   */
+  const logDetail = (row: AktoAuditLog): RowDetail => ({
+    title: row.action || 'Audit entry',
+    subtitle: `${row.user} · ${formatTs(row.timestamp)}`,
+    content: (
+      <div className="detail-body">
+        <DetailSection title="Operation" code="§1">
+          <DetailGrid>
+            <DetailField label="Action" value={row.action || '—'} />
+            <DetailField label="User" value={row.user || '—'} />
+            <DetailField label="Resource" value={row.resource || '—'} />
+            <DetailField label="Recorded" value={formatTs(row.timestamp)} mono />
+            <DetailField label="Entry ID" value={row.id} mono span="full" copyValue={row.id} />
+          </DetailGrid>
+        </DetailSection>
+        {row.details ? (
+          <DetailSection title="Details" code="§2" description="Full payload — not truncated">
+            <DetailCode label="Details" value={row.details} />
+          </DetailSection>
+        ) : null}
+      </div>
+    ),
+  });
 
   return (
     <div className="space-y-5 animate-fade-in max-w-5xl mx-auto pb-10">
@@ -45,33 +134,15 @@ const AuditLogs: React.FC = () => {
 
         {isLoading ? (
           <div className="flex items-center justify-center py-12"><Loader2 className="h-5 w-5 animate-spin text-brand" /></div>
-        ) : logs.length === 0 ? (
-          <div className="py-10 text-center text-xs text-text-muted">No audit logs found</div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-xs">
-              <thead><tr className="border-b border-border-subtle bg-bg-base/50">
-                <th className="text-left px-5 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-text-muted">Timestamp</th>
-                <th className="text-left px-5 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-text-muted">User</th>
-                <th className="text-left px-5 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-text-muted">Action</th>
-                <th className="text-left px-5 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-text-muted">Resource</th>
-                <th className="text-left px-5 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-text-muted">Details</th>
-              </tr></thead>
-              <tbody className="divide-y divide-border-subtle">
-                {logs.map(log => (
-                  <tr key={log.id} className="data-row-interactive hover:bg-white/[0.02] transition-colors">
-                    <td className="px-5 py-3 text-[11px] text-text-muted font-mono whitespace-nowrap">{new Date(log.timestamp).toLocaleString()}</td>
-                    <td className="px-5 py-3 text-[12px] text-text-primary">{log.user}</td>
-                    <td className="px-5 py-3">
-                      <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-brand/10 text-brand border border-brand/20">{log.action}</span>
-                    </td>
-                    <td className="px-5 py-3 text-[11px] text-text-muted">{log.resource || '-'}</td>
-                    <td className="px-5 py-3 text-[11px] text-text-muted max-w-[200px] truncate">{log.details || '-'}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <ResponsiveTable
+            data={logs}
+            columns={logColumns}
+            label="Audit trail"
+            emptyMessage="No audit logs found"
+            keyExtractor={row => row.id}
+            detail={logDetail}
+          />
         )}
       </div>
     </div>

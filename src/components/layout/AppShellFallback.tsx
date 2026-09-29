@@ -5,8 +5,7 @@ type AppShellFallbackProps = {
   message?: string;
 };
 
-const shimmerClass =
-  'animate-pulse rounded-xl bg-[linear-gradient(90deg,rgba(255,255,255,0.65),rgba(244,241,251,0.92),rgba(255,255,255,0.65))]';
+const shimmerClass = 'animate-pulse rounded-xl bg-white/10';
 
 const AppShellFallback: React.FC<AppShellFallbackProps> = ({
   variant = 'app',
@@ -14,10 +13,11 @@ const AppShellFallback: React.FC<AppShellFallbackProps> = ({
 }) => {
   if (variant === 'auth') {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[radial-gradient(circle_at_top_left,rgba(99,44,175,0.10),transparent_28%),linear-gradient(180deg,#fbfaff,#f3f1f8)] px-6">
-        <div className="w-full max-w-md rounded-3xl border border-border-subtle bg-white/90 p-8 shadow-[0_20px_80px_rgba(15,23,42,0.08)] backdrop-blur">
+      <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#070b14] px-6">
+        <div className="app-aurora" aria-hidden />
+        <div className="relative w-full max-w-md rounded-3xl border border-white/10 bg-white/[0.06] p-8 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-2xl">
           <div className="flex items-center gap-3">
-            <div className="h-11 w-11 rounded-2xl bg-brand/10" />
+            <div className="h-11 w-11 rounded-2xl bg-brand/20" />
             <div className="space-y-2">
               <div className={`h-3 w-32 ${shimmerClass}`} />
               <div className={`h-2.5 w-44 ${shimmerClass}`} />
@@ -28,15 +28,16 @@ const AppShellFallback: React.FC<AppShellFallbackProps> = ({
             <div className={`h-12 w-full ${shimmerClass}`} />
             <div className={`h-11 w-full ${shimmerClass}`} />
           </div>
-          <p className="mt-6 text-center text-xs text-text-muted">{message}</p>
+          <p className="mt-6 text-center text-xs text-white/50">{message}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen w-full overflow-hidden bg-[radial-gradient(circle_at_top_left,rgba(99,44,175,0.08),transparent_24%),linear-gradient(180deg,#faf9fd,#f2f2f7)] text-text-primary">
-      <aside className="hidden min-h-screen w-[88px] shrink-0 border-r border-border-subtle bg-[#f4f4f8] px-3 py-5 lg:flex lg:flex-col">
+    <div className="app-shell relative flex min-h-screen w-full overflow-hidden bg-bg-base text-text-primary">
+      <div className="app-aurora" aria-hidden />
+      <aside className="hidden min-h-screen w-[88px] shrink-0 border-r border-white/10 bg-bg-sidebar px-3 py-5 backdrop-blur-2xl lg:flex lg:flex-col">
         <div className="flex items-center justify-center pb-5">
           <div className={`h-11 w-11 rounded-2xl ${shimmerClass}`} />
         </div>
@@ -50,8 +51,8 @@ const AppShellFallback: React.FC<AppShellFallbackProps> = ({
         </div>
       </aside>
 
-      <main className="flex min-h-screen flex-1 flex-col overflow-hidden">
-        <div className="border-b border-border-subtle bg-white/65 px-4 py-3 backdrop-blur md:px-6">
+      <main className="relative flex min-h-screen flex-1 flex-col overflow-hidden">
+        <div className="border-b border-white/10 bg-white/[0.04] px-4 py-3 backdrop-blur-xl md:px-6">
           <div className="flex items-center justify-between gap-3">
             <div className="space-y-2">
               <div className={`h-3 w-32 rounded-full ${shimmerClass}`} />
@@ -85,7 +86,7 @@ const AppShellFallback: React.FC<AppShellFallbackProps> = ({
           </div>
         </div>
 
-        <div className="border-t border-border-subtle bg-white/55 px-6 py-3 text-center text-xs text-text-muted backdrop-blur">
+        <div className="border-t border-white/10 bg-white/[0.04] px-6 py-3 text-center text-xs text-text-muted backdrop-blur">
           {message}
         </div>
       </main>

@@ -18,7 +18,7 @@ const dayLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const hourLabels = ['12a', '', '', '3a', '', '', '6a', '', '', '9a', '', '', '12p', '', '', '3p', '', '', '6p', '', '', '9p', '', ''];
 
 function getIntensityColor(value: number, max: number, colors: string[]): string {
-  if (value === 0 || max === 0) return 'rgba(0,0,0,0.02)';
+  if (value === 0 || max === 0) return 'var(--chart-track)';
   const pct = value / max;
   if (pct < 0.2) return colors[0];
   if (pct < 0.4) return colors[1];

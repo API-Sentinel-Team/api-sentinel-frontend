@@ -5,6 +5,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { TabNav } from '@/components/layout/TabNav';
 import QueryError from '@/components/shared/QueryError';
 import TableSkeleton from '@/components/shared/TableSkeleton';
+import TableScroller from '@/components/shared/TableScroller';
 import GlassCard from '@/components/ui/GlassCard';
 import MetricWidget from '@/components/ui/MetricWidget';
 import StatusPulse from '@/components/ui/StatusPulse';
@@ -92,15 +93,15 @@ const OperationsDashboard: React.FC = () => {
         <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <MetricWidget label="Modules online" value={upCount} icon={Server} iconColor="#22C55E" iconBg="rgba(34,197,94,0.1)" />
-            <MetricWidget label="Detection detectors" value={detectionMeta.data?.detectors.length ?? 0} icon={Radar} iconColor="#FF5B2E" iconBg="rgba(255,91,46,0.1)" />
+            <MetricWidget label="Detection detectors" value={detectionMeta.data?.detectors.length ?? 0} icon={Radar} iconColor="var(--brand)" iconBg="var(--bg-selected)" />
             <MetricWidget label="Pentest profiles" value={pentestMeta.data?.inventory.pentest_profile_count ?? 0} icon={Zap} iconColor="#3B82F6" iconBg="rgba(59,130,246,0.1)" />
           </div>
 
           <div className="bg-bg-surface border border-border-subtle rounded-xl overflow-hidden flex-1 flex flex-col">
             {modules.isLoading ? <TableSkeleton columns={8} rows={4} /> : (
-              <div className="overflow-x-auto flex-1">
+              <TableScroller className="flex-1" label="Operational modules">
                 <table className="w-full text-left border-collapse table-fixed min-w-[700px]">
-                  <thead className="bg-bg-base/50">
+                  <thead className="tbl-sticky bg-bg-base/50">
                     <tr>
                       {['Host Name', 'Module', 'Version', 'IP Address', 'Status', 'State', 'Last Heartbeat', 'Policy Ver.'].map((heading) => (
                         <th key={heading} className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-text-muted">{heading}</th>
@@ -133,7 +134,7 @@ const OperationsDashboard: React.FC = () => {
                     )}
                   </tbody>
                 </table>
-              </div>
+              </TableScroller>
             )}
           </div>
         </div>
@@ -142,7 +143,7 @@ const OperationsDashboard: React.FC = () => {
       {activeTab === 'detection' && (
         <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-            <MetricWidget label="Detectors" value={detectionMeta.data?.detectors.length ?? 0} icon={Radar} iconColor="#FF5B2E" iconBg="rgba(255,91,46,0.1)" />
+            <MetricWidget label="Detectors" value={detectionMeta.data?.detectors.length ?? 0} icon={Radar} iconColor="var(--brand)" iconBg="var(--bg-selected)" />
             <MetricWidget label="Thresholds" value={Object.keys(detectionMeta.data?.thresholds ?? {}).length} icon={Activity} iconColor="#3B82F6" iconBg="rgba(59,130,246,0.1)" />
             <MetricWidget label="Pipeline enabled" value={detectionMeta.data?.health.pipeline_enabled ? 1 : 0} icon={ShieldCheck} iconColor="#22C55E" iconBg="rgba(34,197,94,0.1)" suffix={detectionMeta.data?.health.pipeline_enabled ? '' : ''} />
             <MetricWidget label="DB ready" value={detectionMeta.data?.health.db_ready ? 1 : 0} icon={Server} iconColor="#F97316" iconBg="rgba(249,115,22,0.1)" />
@@ -209,7 +210,7 @@ const OperationsDashboard: React.FC = () => {
       {activeTab === 'pentest' && (
         <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-            <MetricWidget label="Templates" value={pentestMeta.data?.inventory.template_count ?? 0} icon={Zap} iconColor="#FF5B2E" iconBg="rgba(255,91,46,0.1)" />
+            <MetricWidget label="Templates" value={pentestMeta.data?.inventory.template_count ?? 0} icon={Zap} iconColor="var(--brand)" iconBg="var(--bg-selected)" />
             <MetricWidget label="Profiles" value={pentestMeta.data?.inventory.pentest_profile_count ?? 0} icon={ShieldCheck} iconColor="#22C55E" iconBg="rgba(34,197,94,0.1)" />
             <MetricWidget label="Auth profiles" value={pentestMeta.data?.inventory.auth_profile_count ?? 0} icon={Activity} iconColor="#3B82F6" iconBg="rgba(59,130,246,0.1)" />
             <MetricWidget label="Engines" value={Object.values(pentestMeta.data?.scan_stack ?? {}).filter(Boolean).length} icon={Server} iconColor="#F97316" iconBg="rgba(249,115,22,0.1)" />

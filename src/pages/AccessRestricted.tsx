@@ -3,7 +3,8 @@ import { ShieldX, ArrowLeft, Mail } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const AccessRestricted: React.FC = () => (
-  <div className="flex min-h-screen items-center justify-center bg-bg-base">
+  <div className="app-shell relative flex min-h-screen items-center justify-center overflow-hidden bg-bg-base">
+    <div className="app-aurora" aria-hidden />
     <div className="text-center animate-fade-in max-w-md">
       {/* Icon */}
       <div className="mx-auto w-20 h-20 rounded-2xl bg-sev-critical/10 border border-sev-critical/20 flex items-center justify-center mb-6">
@@ -23,7 +24,7 @@ const AccessRestricted: React.FC = () => (
             <ArrowLeft size={14} />
             Sign In
           </Link>
-          <button className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium text-white bg-brand hover:bg-brand-light transition-all shadow-[0_0_15px_rgba(99,44,175,0.15)]">
+          <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium text-white bg-brand hover:bg-brand-light transition-all shadow-[0_0_20px_var(--brand-glow)]">
             <Mail size={14} />
             Contact Admin
           </button>

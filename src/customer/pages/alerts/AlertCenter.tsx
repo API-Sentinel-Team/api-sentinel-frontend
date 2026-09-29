@@ -160,7 +160,7 @@ const AlertCard: React.FC<AlertCardProps> = ({ alert, onAcknowledge, onResolve, 
             {alert.message && <p className="text-[11px] text-text-muted line-clamp-2 leading-relaxed">{alert.message}</p>}
             <div className="flex items-center gap-4 flex-wrap">
               {alert.source_ip && <span className="text-[11px] font-mono text-text-secondary">{alert.source_ip}</span>}
-              {alert.endpoint && <span className="text-[11px] font-mono text-text-muted truncate max-w-[300px]">{alert.endpoint}</span>}
+              {alert.endpoint && <span className="text-[11px] font-mono text-text-muted [overflow-wrap:anywhere]" title={alert.endpoint}>{alert.endpoint}</span>}
               <span className="text-[11px] text-text-muted ml-auto whitespace-nowrap">{timeAgo(alert.timestamp)}</span>
             </div>
             <div className="flex items-center gap-2 mt-1">

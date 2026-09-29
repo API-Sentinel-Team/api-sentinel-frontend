@@ -31,10 +31,10 @@ const MetricWidget: React.FC<MetricWidgetProps> = ({
   change,
   changeLabel,
   sparkData,
-  sparkColor = '#FF5B2E',
+  sparkColor = 'var(--brand)',
   icon: Icon,
-  iconColor = '#FF5B2E',
-  iconBg = 'rgba(99, 44, 175, 0.1)',
+  iconColor = 'var(--brand)',
+  iconBg = 'var(--bg-selected)',
   compact = false,
   className,
   onClick,
@@ -56,7 +56,7 @@ const MetricWidget: React.FC<MetricWidgetProps> = ({
       >
         {Icon && (
           <div
-            className="w-8 h-8 rounded-[2px] flex items-center justify-center shrink-0"
+            className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
             style={{ background: iconBg }}
           >
             <Icon size={16} style={{ color: iconColor }} />
@@ -93,7 +93,7 @@ const MetricWidget: React.FC<MetricWidgetProps> = ({
         <div className="flex items-center gap-2.5">
           {Icon && (
             <div
-              className="w-9 h-9 rounded-[2px] flex items-center justify-center"
+              className="w-9 h-9 rounded-xl flex items-center justify-center"
               style={{ background: iconBg }}
             >
               <Icon size={18} style={{ color: iconColor }} />

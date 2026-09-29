@@ -6,6 +6,7 @@ import TimeFilter from '@/components/shared/TimeFilter';
 import LineChart from '@/components/charts/LineChart';
 import { MethodBadge, AuthBadge } from '@/components/shared/Badges';
 import TableSkeleton from '@/components/shared/TableSkeleton';
+import TableScroller from '@/components/shared/TableScroller';
 import QueryError from '@/components/shared/QueryError';
 import MetricWidget from '@/components/ui/MetricWidget';
 import GlassCard from '@/components/ui/GlassCard';
@@ -319,7 +320,7 @@ const ApiCatalogue: React.FC = () => {
           value={specCoverage}
           suffix="%"
           icon={Eye}
-          iconColor="#FF5B2E"
+          iconColor="var(--brand)"
           iconBg="rgba(99,44,175,0.1)"
           changeLabel="Traffic-based OpenAPI inference"
         />
@@ -383,9 +384,9 @@ const ApiCatalogue: React.FC = () => {
         {isLoading ? (
           <TableSkeleton columns={10} rows={pageSize} />
         ) : (
-          <div className="overflow-x-auto flex-1">
+          <TableScroller className="flex-1" label="API catalogue">
             <table className="w-full text-left border-collapse table-fixed min-w-[700px]">
-              <thead className="bg-bg-base/50">
+              <thead className="tbl-sticky bg-bg-base/50">
                 <tr>
                   <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-text-muted w-10 text-center">
                     <input type="checkbox" className="accent-brand" />
@@ -461,10 +462,15 @@ const ApiCatalogue: React.FC = () => {
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
                           <MethodBadge method={row.id.method} />
-                          <span className="text-[12px] font-mono text-text-primary truncate">{row.id.url}</span>
+                          <span
+                            className="min-w-0 font-mono text-[12px] text-text-primary [overflow-wrap:anywhere]"
+                            title={row.id.url}
+                          >
+                            {row.id.url}
+                          </span>
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-[12px] text-text-secondary truncate">{hostCollection?.hostName || hostCollection?.displayName || '-'}</td>
+                      <td className="px-4 py-3 text-[12px] text-text-secondary [overflow-wrap:anywhere]">{hostCollection?.hostName || hostCollection?.displayName || '-'}</td>
                       <td className="px-4 py-3 text-[11px] font-mono text-text-muted text-center">{formatTs(row.discoveredAt ?? 0)}</td>
                       <td className="px-4 py-3 text-[11px] font-mono text-text-muted text-center">{formatTs(row.lastSeen)}</td>
                       <td className="px-4 py-3 text-center"><AuthBadge auth={isUnauth ? 'Unauth' : 'Authenticated'} /></td>
@@ -482,22 +488,28 @@ const ApiCatalogue: React.FC = () => {
                 )}
               </tbody>
             </table>
-          </div>
+          </TableScroller>
         )}
       </div>
 
-      {/* API Details Side Panel */}
+      {/* API Details Side Panel — bottom sheet on phones, centered dialog on desktop */}
       {showDetailsPanel && selectedApi && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fade-in" onClick={() => setShowDetailsPanel(false)}>
-          <div 
-            className="w-full max-w-2xl bg-bg-surface border border-border-subtle rounded-xl shadow-2xl animate-slide-up m-4"
+        <div className="fixed inset-0 z-[80] flex items-end justify-center bg-black/50 backdrop-blur-sm animate-fade-in sm:items-center" onClick={() => setShowDetailsPanel(false)}>
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label={`API details for ${selectedApi.id.url}`}
+            className="flex max-h-[92vh] w-full max-w-2xl animate-detail-in-bottom flex-col rounded-t-[22px] border border-border-subtle bg-bg-surface shadow-2xl sm:m-4 sm:max-h-[85vh] sm:animate-slide-up sm:rounded-xl"
             onClick={e => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between p-4 border-b border-border-subtle">
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-2">
+            <div className="flex justify-center pt-2.5 sm:hidden">
+              <span className="h-1 w-10 rounded-full bg-border-default" aria-hidden />
+            </div>
+            <div className="flex shrink-0 items-start justify-between gap-3 border-b border-border-subtle p-4">
+              <div className="flex min-w-0 items-start gap-3">
+                <div className="flex min-w-0 items-start gap-2">
                   <MethodBadge method={selectedApi.id.method} />
-                  <span className="text-sm font-bold text-text-primary font-mono">{selectedApi.id.url}</span>
+                  <span className="min-w-0 break-all font-mono text-sm font-bold text-text-primary">{selectedApi.id.url}</span>
                 </div>
               </div>
               <button 
@@ -508,9 +520,9 @@ const ApiCatalogue: React.FC = () => {
               </button>
             </div>
             
-            <div className="p-4 space-y-4 max-h-[70vh] overflow-y-auto">
+            <div className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain p-4">
               {/* Basic Info */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
                   <p className="text-[11px] text-text-muted uppercase tracking-wider font-semibold">API Collection</p>
                   <p className="text-sm text-text-primary mt-1">

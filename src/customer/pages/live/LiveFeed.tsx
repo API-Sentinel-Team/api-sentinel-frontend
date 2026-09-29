@@ -166,7 +166,7 @@ const LiveFeed: React.FC = () => {
       <div className="flex items-end justify-between flex-wrap gap-3">
         <div>
           <h1 className="evd-display text-xl" style={{ color: 'var(--evd-paper)' }}>
-            LIVE TRAFFIC FEED
+            Live traffic
           </h1>
           <div className="flex items-center gap-3 mt-2 flex-wrap">
             <EvidenceStamp tone={connected ? 'ok' : 'warn'} pulse>
@@ -285,7 +285,7 @@ const LiveFeed: React.FC = () => {
         )}
 
         <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_280px]">
-          <div ref={tableBodyRef} onScroll={handleScroll} className="overflow-auto" style={{ maxHeight: 580 }}>
+          <div ref={tableBodyRef} onScroll={handleScroll} className="order-2 min-w-0 overflow-auto lg:order-1" style={{ maxHeight: 580 }}>
             <table className="evd-table min-w-[720px]">
               <thead className="sticky top-0 z-10">
                 <tr>
@@ -338,7 +338,15 @@ const LiveFeed: React.FC = () => {
                     <tr
                       key={entry.id}
                       data-selected={isSelected || undefined}
+                      tabIndex={0}
+                      aria-label={`${entry.method} ${entry.path} — ${entry.status || 'no status'}`}
                       onClick={() => setSelectedId(entry.id)}
+                      onKeyDown={(event) => {
+                        if (event.key === 'Enter' || event.key === ' ') {
+                          event.preventDefault();
+                          setSelectedId(entry.id);
+                        }
+                      }}
                       style={attacks.length ? { background: 'var(--evd-signal-dim)' } : undefined}
                     >
                       <td className="whitespace-nowrap">
@@ -359,7 +367,7 @@ const LiveFeed: React.FC = () => {
                             {entry.host}
                           </div>
                         ) : null}
-                        <div className="evd-mono text-[12px] truncate">{entry.path}</div>
+                        <div className="evd-mono text-[12px] truncate" title={entry.host ? `${entry.host}${entry.path}` : entry.path}>{entry.path}</div>
                       </td>
                       <td className="evd-mono text-[12px] font-bold tabular-nums" style={{ color: sc }}>
                         {entry.status || '—'}
@@ -386,7 +394,10 @@ const LiveFeed: React.FC = () => {
             </table>
           </div>
 
-          <aside className="evd-inspector">
+          <aside
+            className="evd-inspector order-1 lg:order-2 lg:sticky lg:top-2 lg:max-h-[560px] lg:self-start lg:overflow-y-auto"
+            aria-label="Selected event details"
+          >
             {selected ? (
               <div className="space-y-3">
                 <div className="flex items-center justify-between gap-2">

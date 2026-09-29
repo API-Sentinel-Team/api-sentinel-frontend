@@ -93,8 +93,8 @@ const LicenseUsage: React.FC = () => {
 
   return (
     <div className="space-y-5 animate-fade-in w-full pb-10 max-w-6xl mx-auto">
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="flex min-w-0 items-center gap-3">
           <button
             onClick={() => navigate('/admin/settings')}
             className="w-9 h-9 rounded-xl border border-border-subtle bg-bg-surface flex items-center justify-center text-text-muted hover:text-text-primary hover:border-brand/20 transition-all"

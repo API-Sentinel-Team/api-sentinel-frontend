@@ -72,7 +72,7 @@ const ApiGovernance: React.FC = () => {
         </GlassCard>
 
         {/* Severity cards */}
-        <div className="lg:col-span-2 grid grid-cols-4 gap-2">
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:col-span-2">
           {([
             { key: 'critical', label: 'Critical', icon: XCircle, color: '#EF4444' },
             { key: 'major', label: 'Major', icon: AlertCircle, color: '#632CA6' },
@@ -88,7 +88,7 @@ const ApiGovernance: React.FC = () => {
         </div>
 
         {/* Status summary */}
-        <div className="lg:col-span-2 grid grid-cols-4 gap-2">
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:col-span-2">
           {Object.entries(counts.stat).map(([k, v]) => (
             <div key={k} className="metric-card p-3 flex flex-col items-center gap-1.5">
               <AnimatedCounter value={v} className="text-lg font-bold text-text-primary" />

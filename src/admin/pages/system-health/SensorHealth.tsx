@@ -1,6 +1,7 @@
 import React from 'react';
 import { RefreshCw, Radio } from 'lucide-react';
 import TableSkeleton from '@/components/shared/TableSkeleton';
+import TableScroller from '@/components/shared/TableScroller';
 import QueryError from '@/components/shared/QueryError';
 import StatusPulse from '@/components/ui/StatusPulse';
 import { useModuleInfo } from '@/hooks/use-admin';
@@ -42,9 +43,9 @@ const SensorHealth: React.FC = () => {
         </div>
 
         {isLoading ? <TableSkeleton columns={6} rows={3} /> : (
-          <div className="overflow-x-auto flex-1">
+          <TableScroller className="flex-1" label="Sensors">
             <table className="w-full text-left border-collapse table-fixed min-w-[550px]">
-              <thead className="bg-bg-base/50">
+              <thead className="tbl-sticky bg-bg-base/50">
                 <tr>
                   {['Host Name', 'Module', 'Version', 'IP Address', 'Status', 'Last Heartbeat'].map(h => (
                     <th key={h} className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-text-muted">{h}</th>
@@ -75,7 +76,7 @@ const SensorHealth: React.FC = () => {
                 )}
               </tbody>
             </table>
-          </div>
+          </TableScroller>
         )}
       </div>
     </div>

@@ -180,7 +180,7 @@ const AttackSequenceTimeline: React.FC<AttackSequenceTimelineProps> = ({
                       {event.endpoint && (
                         <div className="flex items-center gap-1">
                           <span className="font-mono">{event.method}</span>
-                          <span className="font-mono truncate max-w-[200px]">{event.endpoint}</span>
+                          <span className="font-mono [overflow-wrap:anywhere]" title={event.endpoint}>{event.endpoint}</span>
                         </div>
                       )}
                       {event.statusCode && (

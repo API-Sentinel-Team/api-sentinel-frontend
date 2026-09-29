@@ -266,7 +266,7 @@ const SecurityEvents: React.FC = () => {
                       <td className="px-4 py-3 text-[11px] font-mono text-text-muted">{formatTs(row.timestamp)}</td>
                       <td className="px-4 py-3 text-[11px] text-text-secondary">{row.category}</td>
                       <td className="px-4 py-3 text-[11px] text-text-secondary">{row.subCategory}</td>
-                      <td className="px-4 py-3 text-[11px] text-text-muted truncate">{row.description}</td>
+                      <td className="px-4 py-3 text-[11px] text-text-muted [overflow-wrap:anywhere]">{row.description}</td>
                       <td className="px-4 py-3 text-[11px] font-mono text-text-muted">{row.eventId?.substring(0, 8)}</td>
                     </tr>
                   );
@@ -280,17 +280,23 @@ const SecurityEvents: React.FC = () => {
         )}
       </div>
 
-      {/* Event Details Side Panel */}
+      {/* Event Details Side Panel — bottom sheet on phones, centered dialog on desktop */}
       {showDetailsPanel && selectedEvent && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fade-in" onClick={() => setShowDetailsPanel(false)}>
-          <div 
-            className="w-full max-w-2xl bg-bg-surface border border-border-subtle rounded-xl shadow-2xl animate-slide-up m-4"
+        <div className="fixed inset-0 z-[80] flex items-end justify-center bg-black/50 backdrop-blur-sm animate-fade-in sm:items-center" onClick={() => setShowDetailsPanel(false)}>
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label={`Security event ${selectedEvent.category}`}
+            className="flex max-h-[92vh] w-full max-w-2xl animate-detail-in-bottom flex-col rounded-t-[22px] border border-border-subtle bg-bg-surface shadow-2xl sm:m-4 sm:max-h-[85vh] sm:animate-slide-up sm:rounded-xl"
             onClick={e => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between p-4 border-b border-border-subtle">
-              <div className="flex items-center gap-3">
+            <div className="flex justify-center pt-2.5 sm:hidden">
+              <span className="h-1 w-10 rounded-full bg-border-default" aria-hidden />
+            </div>
+            <div className="flex shrink-0 items-start justify-between gap-3 border-b border-border-subtle p-4">
+              <div className="flex min-w-0 items-center gap-3">
                 <SeverityBadge severity={mapSev(selectedEvent.severity)} />
-                <span className="text-sm font-bold text-text-primary">{selectedEvent.category}</span>
+                <span className="min-w-0 break-words text-sm font-bold text-text-primary">{selectedEvent.category}</span>
               </div>
               <button 
                 onClick={() => setShowDetailsPanel(false)}
@@ -300,8 +306,8 @@ const SecurityEvents: React.FC = () => {
               </button>
             </div>
             
-            <div className="p-4 space-y-4 max-h-[70vh] overflow-y-auto">
-              <div className="grid grid-cols-2 gap-4">
+            <div className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain p-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
                   <p className="text-[11px] text-text-muted uppercase tracking-wider font-semibold">Endpoint</p>
                   <p className="text-sm text-text-primary mt-1 font-mono">{selectedEvent.method} {selectedEvent.url}</p>
