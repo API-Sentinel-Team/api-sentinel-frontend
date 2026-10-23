@@ -12,7 +12,7 @@ export function formatAbsolute(iso: string): string {
   return date.toISOString().replace('T', ' ').replace(/\.\d+Z$/, ' UTC');
 }
 
-export function formatRelative(iso: string, now = Date.now()): string {
+export function formatRelative(iso: string | number, now = Date.now()): string {
   const date = new Date(iso);
   if (Number.isNaN(date.getTime())) return '—';
   const delta = Math.max(0, now - date.getTime());

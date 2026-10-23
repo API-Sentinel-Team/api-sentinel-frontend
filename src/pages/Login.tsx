@@ -6,6 +6,8 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
 import { validateEmail, validatePassword } from '@/lib/validations';
+import { AegisBrandMark } from '@/components/brand/AegisBrandMark';
+import { DEMO_CREDENTIALS } from '@/lib/demo-credentials';
 
 const FEATURES = [
   {
@@ -57,29 +59,6 @@ function getPasswordValidationError(password: string, isSignup: boolean): string
   return null;
 }
 
-const BrandMark: React.FC<{ size?: 'sm' | 'md' }> = ({ size = 'md' }) => (
-  <div className="flex items-center gap-3">
-    <div
-      className={`flex items-center justify-center rounded-2xl font-bold tracking-tight text-white ${
-        size === 'md' ? 'h-11 w-11 text-[15px]' : 'h-10 w-10 text-[13px]'
-      }`}
-      style={{
-        background: 'linear-gradient(135deg, #3D8BFF 0%, #4EE0C2 100%)',
-        boxShadow: '0 0 0 1px rgba(255,255,255,0.12), 0 10px 28px rgba(61,139,255,0.28)',
-      }}
-    >
-      S
-    </div>
-    <div>
-      <div className="font-semibold tracking-tight text-white" style={{ fontSize: size === 'md' ? 16 : 14 }}>
-        API Sentinel
-      </div>
-      <div className="text-[11px] font-medium uppercase tracking-[0.16em] text-white/50">
-        Runtime security command
-      </div>
-    </div>
-  </div>
-);
 
 const Login: React.FC = () => {
   const [email, setEmail] = React.useState('');
@@ -94,7 +73,7 @@ const Login: React.FC = () => {
   const [passwordError, setPasswordError] = React.useState<string | null>(null);
   const { user, login, signup, error: authError } = useAuth();
   const location = useLocation();
-  const from = (location.state as { from?: { pathname: string } })?.from?.pathname || '/';
+  const from = (location.state as { from?: { pathname: string } })?.from?.pathname || '/app/dashboard';
 
   if (user) return <Navigate to={from} replace />;
 
@@ -157,57 +136,137 @@ const Login: React.FC = () => {
   const displayError = localError || authError;
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#070b14] text-white">
-      <div className="app-aurora opacity-90" aria-hidden />
-      <div className="pointer-events-none absolute inset-0 opacity-[0.08]" style={{
-        backgroundImage: 'linear-gradient(rgba(255,255,255,0.18) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.18) 1px, transparent 1px)',
-        backgroundSize: '36px 36px',
-      }} />
-      <div className="relative grid min-h-screen lg:grid-cols-[1.15fr_minmax(400px,480px)]">
-        <section className="relative hidden overflow-hidden lg:flex lg:flex-col">
+    <div
+      className="min-h-screen"
+      style={{
+        background: '#F8FAFC',
+        color: '#0F172A',
+        fontFamily: "'Plus Jakarta Sans', 'IBM Plex Sans', system-ui, sans-serif",
+      }}
+    >
+      <div className="grid min-h-screen lg:grid-cols-[1.2fr_minmax(400px,480px)]">
+        {/* Left — Architectural dark brand panel */}
+        <section
+          className="relative hidden overflow-hidden lg:flex lg:flex-col"
+          style={{ background: '#0B0F17', color: '#CBD5E1', borderRight: '1px solid #1E293B' }}
+        >
+          <div
+            className="pointer-events-none absolute inset-0 opacity-40"
+            style={{
+              backgroundImage:
+                'radial-gradient(circle at 18% 22%, rgba(37,99,235,0.42), transparent 45%), radial-gradient(circle at 85% 8%, rgba(255,91,46,0.28), transparent 38%)',
+            }}
+          />
+          <div
+            className="pointer-events-none absolute inset-0 opacity-[0.06]"
+            style={{
+              backgroundImage:
+                'linear-gradient(rgba(248,250,252,0.18) 1px, transparent 1px), linear-gradient(90deg, rgba(248,250,252,0.18) 1px, transparent 1px)',
+              backgroundSize: '32px 32px',
+            }}
+          />
+          <div
+            className="pointer-events-none absolute inset-0"
+            style={{ background: 'linear-gradient(to bottom, transparent, transparent, rgba(11,15,23,0.85))' }}
+          />
+
           <div className="relative flex flex-1 flex-col justify-between p-10 xl:p-14">
-            <BrandMark />
+            <AegisBrandMark variant="light" />
 
             <div className="my-8 max-w-xl space-y-9 xl:my-10">
               <div className="space-y-5">
-                <p className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-[11px] font-medium text-white/80 backdrop-blur-md">
-                  <BadgeCheck className="h-3.5 w-3.5 text-[#4EE0C2]" />
+                <p
+                  className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-medium"
+                  style={{
+                    border: '1px solid rgba(255,91,46,0.3)',
+                    background: 'rgba(255,91,46,0.1)',
+                    color: '#F8FAFC',
+                  }}
+                >
+                  <BadgeCheck className="h-3.5 w-3.5" style={{ color: '#FF5B2E' }} />
                   Enterprise API security platform
                 </p>
-                <h1 className="text-[2.2rem] leading-[1.1] font-semibold tracking-tight text-white xl:text-[2.7rem]">
-                  See every API.
-                  <span className="mt-1 block bg-gradient-to-r from-[#6EA8FF] to-[#4EE0C2] bg-clip-text text-transparent">
-                    Stop the ones that matter.
+                <h1
+                  className="text-[2.1rem] leading-[1.12] font-bold tracking-tight xl:text-[2.5rem]"
+                  style={{
+                    fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+                    color: '#F8FAFC',
+                  }}
+                >
+                  Evidence before action.
+                  <span
+                    className="mt-1 block bg-clip-text text-transparent"
+                    style={{
+                      backgroundImage: 'linear-gradient(90deg, #FF5B2E, #60A5FA)',
+                      WebkitBackgroundClip: 'text',
+                    }}
+                  >
+                    Protection before breach.
                   </span>
                 </h1>
-                <p className="max-w-md text-[15px] leading-[1.65] text-white/65">
-                  Live inventory, correlated detections, and controlled enforcement — a command surface for security teams.
+                <p className="max-w-md text-[15px] leading-[1.65]" style={{ color: '#94A3B8' }}>
+                  Discover, test, and protect your APIs — live inventory, correlated detections, and
+                  enforcement with audit-ready evidence for security teams.
                 </p>
               </div>
 
               <div className="grid gap-3 sm:grid-cols-3">
                 {FEATURES.map(({ icon: Icon, title, desc }) => (
-                  <div key={title} className="group rounded-2xl border border-white/10 bg-white/[0.05] p-4 backdrop-blur-xl transition hover:border-white/20 hover:bg-white/[0.08]">
-                    <Icon className="mb-3 h-4 w-4 text-[#6EA8FF] transition-transform group-hover:scale-105" />
-                    <div className="text-[13px] font-semibold text-white">{title}</div>
-                    <p className="mt-1.5 text-[11.5px] leading-relaxed text-white/55">{desc}</p>
+                  <div
+                    key={title}
+                    className="group rounded-xl p-4 transition-colors"
+                    style={{
+                      border: '1px solid rgba(37,43,54,0.9)',
+                      background: 'rgba(26,31,40,0.45)',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.borderColor = 'rgba(255,91,46,0.35)';
+                      e.currentTarget.style.background = 'rgba(26,31,40,0.7)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.borderColor = 'rgba(37,43,54,0.9)';
+                      e.currentTarget.style.background = 'rgba(26,31,40,0.45)';
+                    }}
+                  >
+                    <Icon className="mb-3 h-4 w-4 transition-transform group-hover:scale-105" style={{ color: '#FF5B2E' }} />
+                    <div className="text-[13px] font-semibold" style={{ color: '#F4F1EA' }}>
+                      {title}
+                    </div>
+                    <p className="mt-1.5 text-[11.5px] leading-relaxed" style={{ color: 'rgba(200,196,188,0.65)' }}>
+                      {desc}
+                    </p>
                   </div>
                 ))}
               </div>
 
-              <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4 backdrop-blur-xl">
-                <div className="mb-3 text-[10px] uppercase tracking-[0.14em] text-white/40">
+              <div className="rounded-xl p-4" style={{ border: '1px solid rgba(37,43,54,0.8)', background: 'rgba(14,17,22,0.4)' }}>
+                <div
+                  className="mb-3 uppercase"
+                  style={{
+                    fontSize: 10,
+                    letterSpacing: '0.08em',
+                    color: 'rgba(200,196,188,0.45)',
+                    fontFamily: "'IBM Plex Mono', monospace",
+                  }}
+                >
                   Security capability flow
                 </div>
                 <div className="flex flex-wrap gap-x-1 gap-y-2">
                   {FLOW.map((step, i) => (
                     <div key={step.title} className="flex items-center gap-1">
-                      <div className="rounded-xl border border-white/10 bg-white/[0.05] px-2.5 py-1.5">
-                        <div className="text-[11px] font-semibold text-white">{step.title}</div>
-                        <div className="text-[10px] text-white/50">{step.sub}</div>
+                      <div
+                        className="rounded-md px-2.5 py-1.5"
+                        style={{ border: '1px solid rgba(37,43,54,0.8)', background: 'rgba(26,31,40,0.5)' }}
+                      >
+                        <div className="text-[11px] font-semibold" style={{ color: '#F4F1EA' }}>
+                          {step.title}
+                        </div>
+                        <div className="text-[10px]" style={{ color: 'rgba(200,196,188,0.55)' }}>
+                          {step.sub}
+                        </div>
                       </div>
                       {i < FLOW.length - 1 && (
-                        <ChevronRight className="mx-0.5 h-3.5 w-3.5 shrink-0 text-white/25" />
+                        <ChevronRight className="mx-0.5 h-3.5 w-3.5 shrink-0" style={{ color: 'rgba(200,196,188,0.3)' }} />
                       )}
                     </div>
                   ))}
@@ -216,15 +275,26 @@ const Login: React.FC = () => {
 
               <div className="flex flex-wrap gap-2">
                 {['OWASP', 'Nuclei', 'Schemathesis', 'eBPF', 'OpenAPI', 'CI/CD Gate'].map((tag) => (
-                  <span key={tag} className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-0.5 text-[10.5px] font-medium text-white/60">
+                  <span
+                    key={tag}
+                    className="rounded-full px-2.5 py-0.5 text-[10.5px] font-medium"
+                    style={{
+                      border: '1px solid rgba(37,43,54,0.7)',
+                      background: 'rgba(26,31,40,0.4)',
+                      color: 'rgba(200,196,188,0.7)',
+                    }}
+                  >
                     {tag}
                   </span>
                 ))}
               </div>
             </div>
 
-            <footer className="flex items-start gap-2.5 border-t border-white/10 pt-6 text-[11px] leading-relaxed text-white/45">
-              <Lock className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#6EA8FF]" />
+            <footer
+              className="flex items-start gap-2.5 pt-6 text-[11px] leading-relaxed"
+              style={{ borderTop: '1px solid rgba(37,43,54,0.8)', color: 'rgba(200,196,188,0.5)' }}
+            >
+              <Lock className="mt-0.5 h-3.5 w-3.5 shrink-0" style={{ color: 'rgba(255,91,46,0.7)' }} />
               <span>
                 Sessions use httpOnly cookies. Tenant data is scoped by account. Active scans require an
                 allowlisted target and authenticated profile.
@@ -234,34 +304,69 @@ const Login: React.FC = () => {
         </section>
 
         {/* Right — credential panel */}
-        <section className="relative flex flex-col justify-center px-6 py-10 sm:px-10 lg:px-12 xl:px-14">
-          <div className="mb-8 rounded-2xl border border-white/10 bg-white/[0.05] p-5 backdrop-blur-xl lg:hidden">
-            <BrandMark size="sm" />
-            <p className="mt-4 text-[15px] font-semibold leading-snug text-white">
-              See every API. Stop the ones that matter.
+        <section className="relative flex flex-col justify-center px-6 py-10 sm:px-10 lg:px-12 xl:px-14" style={{ background: '#F8FAFC' }}>
+          {/* Mobile brand strip */}
+          <div
+            className="mb-8 rounded-xl p-5 lg:hidden"
+            style={{ background: '#0B0F17', color: '#CBD5E1', border: '1px solid #1E293B' }}
+          >
+            <AegisBrandMark size="sm" variant="light" />
+            <p className="mt-4 text-[15px] font-semibold leading-snug" style={{ color: '#F8FAFC' }}>
+              Evidence before action. Protection before breach.
             </p>
-            <p className="mt-2 text-[12px] leading-relaxed text-white/60">
+            <p className="mt-2 text-[12px] leading-relaxed" style={{ color: '#94A3B8' }}>
               Live API discovery, testing, and runtime protection.
             </p>
           </div>
 
-          <div className="mx-auto w-full max-w-[400px] space-y-7">
+          <div className="mx-auto w-full max-w-[400px] space-y-6">
             <div className="space-y-1.5 lg:pt-2">
-              <h2 className="text-[1.7rem] font-semibold tracking-tight text-white">
+              <h2
+                className="text-[1.65rem] font-bold tracking-tight"
+                style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", color: '#0F172A' }}
+              >
                 {isSignup ? 'Create account' : 'Welcome back'}
               </h2>
-              <p className="text-[13px] leading-relaxed text-white/55">
+              <p className="text-[13px] leading-relaxed" style={{ color: '#475569' }}>
                 {isSignup
                   ? 'Set up your admin account for a new tenant workspace.'
-                  : 'Sign in with your operator credentials.'}
+                  : 'Sign in with your allowlisted operator credentials.'}
               </p>
             </div>
 
-            <div className={`overflow-hidden rounded-2xl border border-white/12 bg-white/[0.07] backdrop-blur-2xl shadow-[0_20px_60px_rgba(0,0,0,0.35)] ${shakeError ? 'animate-[shake_0.5s_ease-in-out]' : ''}`}>
-              <div className="border-b border-white/10 px-5 py-3">
-                <p className="text-[11px] font-medium text-white/55">
+            <div
+              className={`overflow-hidden rounded-xl ${shakeError ? 'animate-[shake_0.5s_ease-in-out]' : ''}`}
+              style={{
+                border: '1px solid #E2E8F0',
+                background: '#FFFFFF',
+                boxShadow: '0 1px 3px rgba(15,23,42,0.04), 0 10px 28px -6px rgba(15,23,42,0.08)',
+              }}
+            >
+              <div className="flex items-center justify-between px-5 py-3" style={{ borderBottom: '1px solid #E2E8F0', background: '#F1F5F9' }}>
+                <p className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: '#475569' }}>
                   {isSignup ? 'New admin credentials' : 'Operator credentials'}
                 </p>
+                {!isSignup && DEMO_CREDENTIALS && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEmail(DEMO_CREDENTIALS.email);
+                      setPassword(DEMO_CREDENTIALS.password);
+                      setEmailError(null);
+                      setPasswordError(null);
+                      setLocalError(null);
+                    }}
+                    className="rounded-md px-2 py-0.5 text-[10.5px] font-semibold transition-colors"
+                    style={{
+                      background: 'rgba(255, 91, 46, 0.1)',
+                      color: '#D94418',
+                      border: '1px solid rgba(255, 91, 46, 0.25)',
+                    }}
+                    title="Fill demo operator credentials"
+                  >
+                    Fill Demo Admin
+                  </button>
+                )}
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-4 p-5">
@@ -271,9 +376,9 @@ const Login: React.FC = () => {
                     aria-live="assertive"
                     className="rounded-lg px-3.5 py-2.5 text-[13px] leading-snug"
                     style={{
-                      background: 'rgba(229,72,77,0.14)',
-                      border: '1px solid rgba(229,72,77,0.35)',
-                      color: '#ffb4b8',
+                      background: 'rgba(220,38,38,0.08)',
+                      border: '1px solid rgba(220,38,38,0.22)',
+                      color: '#B42318',
                     }}
                   >
                     {displayError}
@@ -281,7 +386,7 @@ const Login: React.FC = () => {
                 )}
 
                 <div className="space-y-1.5">
-                  <label htmlFor="auth-email" className="text-xs font-medium text-white/80">
+                  <label htmlFor="auth-email" className="text-xs font-medium" style={{ color: '#0E1116' }}>
                     Work email
                   </label>
                   <div className="relative">
@@ -296,26 +401,27 @@ const Login: React.FC = () => {
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="h-11 w-full rounded-xl border pl-10 pr-3 text-sm text-white placeholder:text-white/35 outline-none transition-shadow"
+                      className="h-11 w-full rounded-md border pl-10 pr-3 text-sm outline-none transition-shadow"
                       style={{
-                        background: 'rgba(255,255,255,0.06)',
-                        borderColor: emailError ? '#E5484D' : 'rgba(255,255,255,0.16)',
-                        boxShadow: emailError ? '0 0 0 3px rgba(229,72,77,0.18)' : undefined,
+                        background: '#F8FAFC',
+                        borderColor: emailError ? '#DC2626' : '#CBD5E1',
+                        color: '#0F172A',
+                        boxShadow: emailError ? '0 0 0 3px rgba(220,38,38,0.12)' : undefined,
                       }}
                       onFocus={(e) => {
                         if (!emailError) {
-                          e.target.style.borderColor = '#6EA8FF';
-                          e.target.style.boxShadow = '0 0 0 3px rgba(110,168,255,0.2)';
+                          e.target.style.borderColor = '#2563EB';
+                          e.target.style.boxShadow = '0 0 0 3px rgba(37,99,235,0.12)';
                         }
                       }}
                       onBlur={(e) => {
                         if (email.trim()) {
                           const result = validateEmail(email);
                           setEmailError(result.valid ? null : result.error || null);
-                          e.target.style.borderColor = result.valid ? 'rgba(255,255,255,0.16)' : '#E5484D';
-                          e.target.style.boxShadow = result.valid ? 'none' : '0 0 0 3px rgba(229,72,77,0.18)';
+                          e.target.style.borderColor = result.valid ? '#CBD5E1' : '#DC2626';
+                          e.target.style.boxShadow = result.valid ? 'none' : '0 0 0 3px rgba(220,38,38,0.12)';
                         } else {
-                          e.target.style.borderColor = 'rgba(255,255,255,0.16)';
+                          e.target.style.borderColor = '#CBD5E1';
                           e.target.style.boxShadow = 'none';
                         }
                       }}
@@ -330,11 +436,11 @@ const Login: React.FC = () => {
 
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between">
-                    <label htmlFor="auth-password" className="text-xs font-medium text-white/80">
+                    <label htmlFor="auth-password" className="text-xs font-medium" style={{ color: '#0E1116' }}>
                       Password
                     </label>
                     {!isSignup && (
-                      <a href="#" className="text-[11px] font-medium text-[#9bc4ff] hover:underline">
+                      <a href="#" className="text-[11px] font-medium hover:underline" style={{ color: '#D94418' }}>
                         Forgot?
                       </a>
                     )}
@@ -351,16 +457,17 @@ const Login: React.FC = () => {
                       type={showPassword ? 'text' : 'password'}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="h-11 w-full rounded-xl border pl-10 pr-10 text-sm text-white placeholder:text-white/35 outline-none transition-shadow"
+                      className="h-11 w-full rounded-md border pl-10 pr-10 text-sm outline-none transition-shadow"
                       style={{
-                        background: 'rgba(255,255,255,0.06)',
-                        borderColor: passwordError ? '#E5484D' : 'rgba(255,255,255,0.16)',
-                        boxShadow: passwordError ? '0 0 0 3px rgba(229,72,77,0.18)' : undefined,
+                        background: '#F8FAFC',
+                        borderColor: passwordError ? '#DC2626' : '#CBD5E1',
+                        color: '#0F172A',
+                        boxShadow: passwordError ? '0 0 0 3px rgba(220,38,38,0.12)' : undefined,
                       }}
                       onFocus={(e) => {
                         if (!passwordError) {
-                          e.target.style.borderColor = '#6EA8FF';
-                          e.target.style.boxShadow = '0 0 0 3px rgba(110,168,255,0.2)';
+                          e.target.style.borderColor = '#2563EB';
+                          e.target.style.boxShadow = '0 0 0 3px rgba(37,99,235,0.12)';
                         }
                       }}
                       onBlur={(e) => {
@@ -369,10 +476,10 @@ const Login: React.FC = () => {
                           const policy = getPasswordValidationError(password, isSignup);
                           const err = !result.valid ? result.error : policy;
                           setPasswordError(err || null);
-                          e.target.style.borderColor = err ? '#E5484D' : 'rgba(255,255,255,0.16)';
-                          e.target.style.boxShadow = err ? '0 0 0 3px rgba(229,72,77,0.18)' : 'none';
+                          e.target.style.borderColor = err ? '#DC2626' : '#CBD5E1';
+                          e.target.style.boxShadow = err ? '0 0 0 3px rgba(220,38,38,0.12)' : 'none';
                         } else {
-                          e.target.style.borderColor = 'rgba(255,255,255,0.16)';
+                          e.target.style.borderColor = '#CBD5E1';
                           e.target.style.boxShadow = 'none';
                         }
                       }}
@@ -385,7 +492,8 @@ const Login: React.FC = () => {
                       tabIndex={-1}
                       aria-label={showPassword ? 'Hide password' : 'Show password'}
                       onClick={() => setShowPassword((v) => !v)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-white/45"
+                      className="absolute right-3 top-1/2 -translate-y-1/2"
+                      style={{ color: '#8A867E' }}
                     >
                       {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
@@ -400,16 +508,16 @@ const Login: React.FC = () => {
                       checked={rememberMe}
                       onChange={(e) => setRememberMe(e.target.checked)}
                       className="h-4 w-4 rounded"
-                      style={{ accentColor: '#6EA8FF' }}
+                      style={{ accentColor: '#FF5B2E' }}
                     />
-                    <span className="text-xs text-white/60">
+                    <span className="text-xs" style={{ color: '#5C5A56' }}>
                       Remember me
                     </span>
                   </label>
                 )}
 
                 {isSignup && !passwordError && (
-                  <p className="text-[11px] text-white/50">
+                  <p className="text-[11px]" style={{ color: '#5C5A56' }}>
                     Use at least 12 characters and include a letter, number, and symbol.
                   </p>
                 )}
@@ -418,8 +526,14 @@ const Login: React.FC = () => {
                   data-testid="auth-submit"
                   type="submit"
                   disabled={submitting}
-                  className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl px-4 text-[13px] font-semibold text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
-                  style={{ background: 'linear-gradient(135deg, #3D8BFF, #2EC9A0)' }}
+                  className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-md px-4 text-[13px] font-medium text-white transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+                  style={{ background: '#2B4CFF' }}
+                  onMouseEnter={(e) => {
+                    if (!submitting) e.currentTarget.style.background = '#FF5B2E';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = '#2B4CFF';
+                  }}
                 >
                   {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
                   {submitting
@@ -433,7 +547,7 @@ const Login: React.FC = () => {
               </form>
             </div>
 
-            <p className="text-center text-[11px] leading-relaxed text-white/50">
+            <p className="text-center text-[11px] leading-relaxed" style={{ color: '#5C5A56' }}>
               {isSignup ? (
                 <>
                   Already have an account?{' '}
@@ -444,7 +558,8 @@ const Login: React.FC = () => {
                       setIsSignup(false);
                       setLocalError(null);
                     }}
-                    className="font-semibold text-[#9bc4ff] underline-offset-2 hover:underline"
+                    className="font-semibold underline-offset-2 hover:underline"
+                    style={{ color: '#D94418' }}
                   >
                     Sign in
                   </button>
@@ -461,7 +576,8 @@ const Login: React.FC = () => {
                       setIsSignup(true);
                       setLocalError(null);
                     }}
-                    className="font-semibold text-[#9bc4ff] underline-offset-2 hover:underline"
+                    className="font-semibold underline-offset-2 hover:underline"
+                    style={{ color: '#D94418' }}
                   >
                     Create admin account
                   </button>
@@ -469,17 +585,20 @@ const Login: React.FC = () => {
               )}
             </p>
 
-            <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 border-t border-white/10 pt-5 text-[10.5px] text-white/45">
+            <div
+              className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 pt-5 text-[10.5px]"
+              style={{ borderTop: '1px solid #DDD6C8', color: '#5C5A56' }}
+            >
               <span className="inline-flex items-center gap-1.5">
-                <Boxes className="h-3.5 w-3.5 text-[#6EA8FF]" />
+                <Boxes className="h-3.5 w-3.5" style={{ color: 'rgba(43,76,255,0.7)' }} />
                 Live inventory
               </span>
               <span className="inline-flex items-center gap-1.5">
-                <Activity className="h-3.5 w-3.5 text-[#6EA8FF]" />
+                <Activity className="h-3.5 w-3.5" style={{ color: 'rgba(43,76,255,0.7)' }} />
                 Runtime detect
               </span>
               <span className="inline-flex items-center gap-1.5">
-                <ScrollText className="h-3.5 w-3.5 text-[#6EA8FF]" />
+                <ScrollText className="h-3.5 w-3.5" style={{ color: 'rgba(43,76,255,0.7)' }} />
                 Audit evidence
               </span>
             </div>

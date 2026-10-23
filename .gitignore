@@ -28,3 +28,7 @@ test-results
 *.sw?
 .git/
 **/ .git/
+
+vite.config.ts.timestamp-*.mjs
+.playwright-mcp/
+

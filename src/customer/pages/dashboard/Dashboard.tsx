@@ -7,7 +7,7 @@ import DonutChart from '@/components/charts/DonutChart';
 import GeoMap from '@/components/charts/GeoMap';
 import TimeFilter from '@/components/shared/TimeFilter';
 import QueryError from '@/components/shared/QueryError';
-import { useDashboardKPIs, useIssuesTrend, useSeverityBreakdown } from '@/hooks/use-dashboard';
+import { useDashboardKPIs, useIssuesTrend, useSeverityBreakdown, useDashboardActivity } from '@/hooks/use-dashboard';
 import { useThreatCategoryCount, useActorsGeoCount } from '@/hooks/use-protection';
 import { useTestRuns } from '@/hooks/use-security-ops';
 import { centroidForCountryCode } from '@/lib/country-centroids';
@@ -20,11 +20,10 @@ import EvidenceSectionHead from '@/components/ui/EvidenceSectionHead';
 import EvidenceStamp from '@/components/ui/EvidenceStamp';
 import EvidenceLedgerItem from '@/components/ui/EvidenceLedger';
 import { EvidenceStatLine, EvidenceBarLine } from '@/components/ui/EvidenceStatLine';
-import { SignalBoard } from './SignalBoard';
 import EvidenceTrace from '@/components/ui/EvidenceTrace';
-import SentinelArea, { SentinelDonut, SentinelHBars, SentinelVBars, SentinelSpark, type ChartSeries } from '@/components/charts/SentinelCharts';
 import { useLiveTraffic, useRealtimeStatus } from '@/lib/realtime';
 import { formatClock, formatProtocol, formatRelative, methodTone, statusTone } from '@/lib/format';
+import { computePostureScore } from './posture-score';
 
 function daysAgoTs(days: number) {
   return Math.floor((Date.now() - days * 86400_000) / 1000);
@@ -53,14 +52,9 @@ const Dashboard: React.FC = () => {
   const categoryCount = useThreatCategoryCount();
   const geoCount = useActorsGeoCount();
   const testRuns = useTestRuns(25);
+  const activityQuery = useDashboardActivity();
 
-  type IssueKpis = NonNullable<typeof issues.data> & {
-    highIssues?: number;
-    mediumIssues?: number;
-    lowIssues?: number;
-  };
   type TimelineEntry = { date: string; total: number; blocked: number; successful: number };
-  const issueKpis = issues.data as IssueKpis | undefined;
   const threatDataResult: DashboardThreatData = threats.data?.threatData ?? {
     totalActors: 0,
     blockedActors: 0,
@@ -75,26 +69,32 @@ const Dashboard: React.FC = () => {
     threatActors: threatDataResult.totalActors,
     blocked: threatDataResult.blockedActors,
     securityEvents: historicalData?.totalThreats ?? 0,
-    critical: issues.data?.criticalIssues ?? 0,
+    critical: historicalData?.criticalIssues ?? issues.data?.criticalIssues ?? 0,
     resolved: historicalData?.resolvedIssues ?? 0,
     unauth: historicalData?.unauthApis ?? 0,
     whitelisted: threatDataResult.whitelistedActors,
   };
 
-  const totalIssues =
-    (issueKpis?.criticalIssues ?? 0) +
-    (issueKpis?.highIssues ?? 0) +
-    (issueKpis?.mediumIssues ?? 0) +
-    (issueKpis?.lowIssues ?? 0);
+  const totalIssues = issues.data?.openIssues ?? issues.data?.totalIssues ?? 0;
   const postureDenom = totalIssues + kpi.resolved;
-  const postureScore = postureDenom > 0 ? Math.min(100, Math.round((kpi.resolved / postureDenom) * 100)) : 0;
-  const endpointCount = Number(endpoints.data?.endpointsCount ?? 0);
-  const mcpSessions = threatDataResult.mcpSessions ?? 0;
+  const endpointCount = Number(historicalData?.totalApis ?? endpoints.data?.endpointsCount ?? 0);
+  const mcpSessions = historicalData?.mcpEndpoints ?? threatDataResult.mcpSessions ?? 0;
+
+  const postureScore = useMemo(
+    () =>
+      computePostureScore({
+        riskScore: historicalData?.riskScore,
+        openIssues: totalIssues,
+        openCritical: kpi.critical,
+        endpointCount,
+      }),
+    [historicalData?.riskScore, totalIssues, kpi.critical, endpointCount],
+  );
 
   const postureTone =
     postureScore >= 80 ? 'var(--evd-low)' : postureScore >= 50 ? 'var(--evd-medium)' : 'var(--evd-critical)';
   const postureLabel =
-    postureScore >= 80 ? 'HARDENED' : postureScore >= 50 ? 'WATCH' : postureDenom === 0 ? 'NO BASELINE' : 'EXPOSED';
+    postureScore >= 80 ? 'HARDENED' : postureScore >= 50 ? 'WATCH' : postureDenom === 0 && endpointCount === 0 ? 'BASELINE READY' : 'EXPOSED';
 
   const runs = testRuns.data?.runs ?? [];
   const testsRun = runs.reduce((sum, run) => sum + Number(run.total_tests || 0), 0);
@@ -117,12 +117,15 @@ const Dashboard: React.FC = () => {
   const timelineData = useMemo<TimelineEntry[]>(() => {
     const trend = issuesTrend.data?.issuesTrend;
     if (trend && trend.length > 0) {
-      return trend.map((d) => ({
-        date: new Date(d.ts).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-        total: d.total ?? d.count ?? 0,
-        blocked: d.blocked ?? 0,
-        successful: d.successful ?? 0,
-      }));
+      return trend.map((d) => {
+        const ms = d.ts > 1e12 ? d.ts : d.ts * 1000;
+        return {
+          date: new Date(ms).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+          total: d.total ?? d.count ?? 0,
+          blocked: d.blocked ?? 0,
+          successful: d.successful ?? 0,
+        };
+      });
     }
     return [];
   }, [issuesTrend.data]);
@@ -130,7 +133,6 @@ const Dashboard: React.FC = () => {
   const categories = Object.entries(categoryCount.data?.categoryCount ?? {});
   const topCategories = categories.sort((a, b) => b[1] - a[1]).slice(0, 6);
   const maxCatVal = topCategories.length > 0 ? (topCategories[0][1] as number) : 1;
-  const orderedCats = topCategories.map(([name, count]) => ({ name, count: count as number }));
 
   const geoThreats = useMemo(() => {
     const countryCounts = geoCount.data?.countPerCountry || {};
@@ -161,10 +163,10 @@ const Dashboard: React.FC = () => {
             Case file · live posture
           </p>
           <h1 className="evd-display text-2xl md:text-3xl leading-tight" style={{ color: 'var(--evd-paper)' }}>
-            {displayName}
+            {displayName.toUpperCase()}
           </h1>
           <p className="mt-2 text-sm max-w-md" style={{ color: 'var(--evd-ink)' }}>
-            Resolved vs open issues form the score. Numbers below are live API counts only.
+            Open issues lower the score; any open critical keeps it below 50. Numbers below are live API counts only.
           </p>
           <div className="flex items-center gap-3 mt-4 flex-wrap">
             <EvidenceStamp tone={realtime.connected ? 'ok' : 'warn'} pulse>
@@ -340,15 +342,6 @@ const Dashboard: React.FC = () => {
       {/* Timeline */}
       <div className="animate-slide-up" style={{ animationDelay: '160ms' }}>
         <EvidenceSectionHead code="§06" title="Event Trace" desc={timeRange === '24h' ? 'LAST 24 HOURS' : 'LAST 7 DAYS'} />
-        {/* __DASHBOARD_SIGNAL_ANCHOR__ */}
-        <SignalBoard
-          timeline={timelineData}
-          range={timeRange}
-          severity={sevBreakdown.data?.severityCount}
-          categories={orderedCats}
-          live={recentLogs}
-          connected={realtime.connected}
-        />
         <EvidencePanel exhibit="EXH-06">
           <div className="flex gap-1 mb-4">
             {(['total', 'blocked', 'successful'] as const).map((key) => (
@@ -422,6 +415,39 @@ const Dashboard: React.FC = () => {
                 </div>
               );
             })
+          ) : (activityQuery.data?.length ?? 0) > 0 ? (
+            activityQuery.data!.slice(0, 8).map((act, i) => (
+              <div
+                key={act.id || i}
+                className="evd-row"
+                style={{ padding: '8px 0', borderBottom: i < Math.min(7, activityQuery.data!.length - 1) ? '1px solid var(--evd-line)' : 'none' }}
+              >
+                <div className="flex items-center gap-3 min-w-0">
+                  <span
+                    className="evd-mono text-[10px] font-bold px-2 py-0.5 rounded shrink-0"
+                    style={{
+                      background: act.severity === 'CRITICAL' || act.severity === 'HIGH' ? 'rgba(239,68,68,0.12)' : 'rgba(59,130,246,0.12)',
+                      color: act.severity === 'CRITICAL' || act.severity === 'HIGH' ? 'var(--evd-critical)' : 'var(--evd-info)',
+                    }}
+                  >
+                    {act.severity || 'INFO'}
+                  </span>
+                  <span className="text-xs truncate font-medium" style={{ color: 'var(--evd-paper)' }}>
+                    {act.description}
+                  </span>
+                </div>
+                <div className="flex items-center gap-3 shrink-0">
+                  {act.source_ip && (
+                    <span className="evd-mono text-[10px]" style={{ color: 'var(--evd-ink-muted)' }}>
+                      {act.source_ip}
+                    </span>
+                  )}
+                  <span className="evd-mono text-[10px]" style={{ color: 'var(--evd-ink-muted)' }}>
+                    {act.timestamp ? formatRelative(new Date(act.timestamp).getTime()) : 'recent'}
+                  </span>
+                </div>
+              </div>
+            ))
           ) : timelineData.length > 0 ? (
             timelineData
               .slice(-5)

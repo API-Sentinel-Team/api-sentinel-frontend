@@ -5,7 +5,7 @@ import TableSkeleton from '@/components/shared/TableSkeleton';
 import GlassCard from '@/components/ui/GlassCard';
 import MetricWidget from '@/components/ui/MetricWidget';
 import ProgressRing from '@/components/ui/ProgressRing';
-import type { ComplianceFinding } from '@/services/testing.service';
+import { buildComplianceReportHtml } from './compliance-report-html';
 
 function todayStr() {
   return new Date().toISOString().split('T')[0];
@@ -45,65 +45,15 @@ const Reports: React.FC = () => {
     const sections = report?.sections ?? {};
     const postureColor = totalFindings === 0 ? '#22C55E' : totalFindings < 5 ? '#EAB308' : '#EF4444';
 
-    const rows = Object.entries(sections).flatMap(([section, vulns]) =>
-      vulns.map((v: ComplianceFinding) => `
-        <tr>
-          <td style="padding:10px 12px;border-bottom:1px solid #1e2530;font-size:12px;color:#e8edf3">${section}</td>
-          <td style="padding:10px 12px;border-bottom:1px solid #1e2530;font-size:12px;color:#e8edf3">${v.title ?? v.type ?? '-'}</td>
-          <td style="padding:10px 12px;border-bottom:1px solid #1e2530;font-size:12px;font-family:monospace;color:#94a3b8">${v.endpoint ?? v.url ?? '-'}</td>
-          <td style="padding:10px 12px;border-bottom:1px solid #1e2530;font-size:12px;color:${v.severity === 'CRITICAL' || v.severity === 'HIGH' ? '#ef4444' : v.severity === 'MEDIUM' ? '#eab308' : '#22c55e'}">${v.severity ?? '-'}</td>
-        </tr>`).join('')
-    );
-
-    const html = `<!DOCTYPE html><html><head><title>Security Compliance Report</title>
-    <style>
-      *{margin:0;padding:0;box-sizing:border-box}
-      body{font-family:'Segoe UI',Arial,sans-serif;background:#fff;color:#0d1117;padding:40px}
-      .header{border-bottom:3px solid #f97316;padding-bottom:24px;margin-bottom:32px}
-      .logo{font-size:24px;font-weight:900;color:#f97316;letter-spacing:-0.5px}
-      .subtitle{font-size:13px;color:#6b7280;margin-top:4px}
-      .exec-box{background:#f8fafc;border:1px solid #e5e7eb;border-radius:8px;padding:24px;margin-bottom:32px}
-      .exec-title{font-size:16px;font-weight:700;color:#0d1117;margin-bottom:12px}
-      .exec-text{font-size:13px;color:#374151;line-height:1.6}
-      .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:32px}
-      .kpi{border:1px solid #e5e7eb;border-radius:8px;padding:20px;text-align:center}
-      .kpi-val{font-size:36px;font-weight:900;margin-bottom:4px}
-      .kpi-label{font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:.5px}
-      table{width:100%;border-collapse:collapse;font-size:12px}
-      thead tr{background:#f97316}
-      thead th{padding:10px 12px;text-align:left;color:#fff;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px}
-      .footer{margin-top:40px;padding-top:20px;border-top:1px solid #e5e7eb;font-size:11px;color:#9ca3af;display:flex;justify-content:space-between}
-      @media print{body{padding:20px}.kpis{page-break-inside:avoid}}
-    </style></head><body>
-    <div class="header">
-      <div class="logo">API SENTINEL</div>
-      <div class="subtitle">Security Compliance Report &mdash; ${frameworkName}</div>
-      <div style="margin-top:8px;font-size:12px;color:#6b7280">Generated: ${date} &nbsp;&bull;&nbsp; Classification: CONFIDENTIAL</div>
-    </div>
-    <div class="exec-box">
-      <div class="exec-title">Executive Summary</div>
-      <div class="exec-text">
-        This report presents the current API security posture against the <strong>${frameworkName}</strong> framework.
-        The platform has identified <strong>${totalFindings} open finding${totalFindings !== 1 ? 's' : ''}</strong> across <strong>${Object.keys(sections).length} control categories</strong>.
-        Overall compliance posture is assessed as <strong style="color:${postureColor}">${posture}</strong>.
-        ${totalFindings === 0 ? 'All monitored APIs are currently compliant with the selected framework.' : 'Immediate attention is recommended for CRITICAL and HIGH severity findings listed below.'}
-      </div>
-    </div>
-    <div class="kpis">
-      <div class="kpi"><div class="kpi-val" style="color:#ef4444">${totalFindings}</div><div class="kpi-label">Total Findings</div></div>
-      <div class="kpi"><div class="kpi-val" style="color:#f97316">${Object.keys(sections).length}</div><div class="kpi-label">Failed Controls</div></div>
-      <div class="kpi"><div class="kpi-val" style="color:${postureColor}">${posture}</div><div class="kpi-label">Compliance Posture</div></div>
-    </div>
-    ${totalFindings > 0 ? `
-    <table>
-      <thead><tr><th>Category</th><th>Finding</th><th>Endpoint</th><th>Severity</th></tr></thead>
-      <tbody>${rows}</tbody>
-    </table>` : '<div style="text-align:center;padding:40px;color:#22c55e;font-size:16px;font-weight:700">&#x2713; No compliance violations found</div>'}
-    <div class="footer">
-      <span>API Sentinel &copy; ${new Date().getFullYear()} &mdash; Confidential Security Report</span>
-      <span>Framework: ${frameworkName} &mdash; ${date}</span>
-    </div>
-    </body></html>`;
+    const html = buildComplianceReportHtml({
+      frameworkName,
+      date,
+      year: new Date().getFullYear(),
+      sections,
+      totalFindings,
+      posture,
+      postureColor,
+    });
 
     const win = window.open('', '_blank');
     if (win) { win.document.write(html); win.document.close(); win.focus(); setTimeout(() => { win.print(); }, 500); }
