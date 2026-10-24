@@ -7,7 +7,8 @@ const SystemHealthLayout: React.FC = () => {
   const navigate = useNavigate();
 
   const segments = location.pathname.split('/').filter(Boolean);
-  const activeTab = segments[1] || 'controllers';
+  // /admin/system-health[/tab] — tab is segment[2]
+  const activeTab = segments[2] || 'controllers';
 
   const tabs = [
     { key: 'controllers', label: 'Controller Health' },
@@ -16,7 +17,7 @@ const SystemHealthLayout: React.FC = () => {
   ];
 
   const handleTabChange = (key: string) => {
-    navigate(`/system-health/${key}`);
+    navigate(`/admin/system-health/${key}`);
   };
 
   return (

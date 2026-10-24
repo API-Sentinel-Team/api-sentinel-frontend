@@ -7,7 +7,8 @@ const TestingLayout: React.FC = () => {
   const navigate = useNavigate();
 
   const segments = location.pathname.split('/').filter(Boolean);
-  const activeTab = segments[2] || '';
+  const rawTab = segments[2] || '';
+  const activeTab = rawTab === 'vulnerabilities' ? '' : rawTab;
 
   const tabs = [
     { key: '', label: 'Vulnerabilities' },

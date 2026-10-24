@@ -7,7 +7,9 @@ const DiscoveryLayout: React.FC = () => {
   const navigate = useNavigate();
 
   const segments = location.pathname.split('/').filter(Boolean);
-  const activeTab = segments[2] || '';
+  const rawTab = segments[2] || '';
+  // Aliases for API Catalogue index (/app/discovery and /app/discovery/catalogue)
+  const activeTab = rawTab === 'catalogue' || rawTab === 'api-catalogue' ? '' : rawTab;
 
   const tabs = [
     { key: '', label: 'API Catalogue' },

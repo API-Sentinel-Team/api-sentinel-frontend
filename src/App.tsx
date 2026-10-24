@@ -104,9 +104,12 @@ const App = () => (
 
                     <Route path="/app/discovery" element={<DiscoveryLayout />}>
                       <Route index element={<ApiCatalogue />} />
+                      <Route path="catalogue" element={<ApiCatalogue />} />
+                      <Route path="api-catalogue" element={<Navigate to="/app/discovery" replace />} />
                       <Route path="parameters" element={<ParameterCatalogue />} />
                       <Route path="governance" element={<ApiGovernance />} />
                       <Route path="sequence" element={<ApiSequenceFlow />} />
+                      <Route path="sequences" element={<Navigate to="/app/discovery/sequence" replace />} />
                       <Route path="tree" element={<ApiTree />} />
                       <Route path="call-graph" element={<BusinessLogicGraph />} />
                       <Route path="schema" element={<SchemaValidation />} />
@@ -115,6 +118,7 @@ const App = () => (
 
                     <Route path="/app/testing" element={<TestingLayout />}>
                       <Route index element={<Vulnerabilities />} />
+                      <Route path="vulnerabilities" element={<Vulnerabilities />} />
                       <Route path="dashboard" element={<TestDashboard />} />
                       <Route path="configuration" element={<TestConfiguration />} />
                       <Route path="inspector" element={<TestInspector />} />

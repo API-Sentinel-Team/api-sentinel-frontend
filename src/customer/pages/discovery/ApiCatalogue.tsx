@@ -600,7 +600,7 @@ const ApiCatalogue: React.FC = () => {
               <div className="flex gap-2 pt-4 border-t border-border-subtle">
                 <button 
                   onClick={() => {
-                    navigate(`/app/discovery/sequences?endpoint=${encodeURIComponent(selectedApi.id.url)}&method=${selectedApi.id.method}`);
+                    navigate(`/app/discovery/sequence?endpoint=${encodeURIComponent(selectedApi.id.url)}&method=${selectedApi.id.method}`);
                     setShowDetailsPanel(false);
                   }}
                   className="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-brand/10 text-brand hover:bg-brand/20 transition-all text-sm font-semibold"
